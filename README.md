@@ -84,3 +84,15 @@ Connect this repository and deploy the `main` branch. The root `netlify.toml` se
 Set `SESSION_SECRET` and `NEXT_PUBLIC_APP_URL` in Netlify's environment variables before deploying authentication. `NEXT_PUBLIC_APP_URL` should be the full HTTPS site URL. Preview is disabled in production unless `ENABLE_PREVIEW=true` is explicitly set.
 
 The public site can be deployed with this configuration. The current account/KYC store uses local JSON files and must move to persistent server-side storage before accounts and uploads can run reliably on Netlify Functions. Deploying the build does not provide a persistent database.
+
+## Hosted review/demo on Vercel
+
+For a review-only deployment, set `DEMO_MODE=true` and a strong `SESSION_SECRET` in Vercel's Production environment, then redeploy. `NEXT_PUBLIC_APP_URL` should be `https://mycayapp.vercel.app` (or your actual deployment domain).
+
+Hosted demo mode keeps a compressed, AES-GCM-encrypted workspace in bounded HttpOnly cookies instead of the server filesystem. It works across separate serverless instances, is isolated per browser, and expires after two hours of inactivity. It is not persistent account storage and must not hold real investor or KYC data. Removing browser cookies resets the demo. Concurrent edits in multiple tabs can overwrite demo changes; use one tab while reviewing.
+
+Registration creates a temporary demo account and signs it in. `/preview` is available in demo mode; choose Super Admin to review the admin app. Uploaded files are disabled; the KYC wizard permits skipping fields and files. Staff approval in this mode is illustrative. Payments remain simulated. Cookie state has a size limit, so this mode is intended for reviewing a few example investments, not retaining a large history.
+
+Set `DEMO_MODE=false` for a real platform. The normal KYC/document approval checks remain enforced outside demo mode, and a durable database/object-storage integration is still required for real hosted accounts.
+
+`npm run test:hosted-demo` tests registration, KYC, role switching, investment funding, login and tamper rejection across two local production servers. Start both with `DEMO_MODE=true`, the same test `SESSION_SECRET`, and distinct ports; set `TEST_URL` and `SECOND_TEST_URL`. The check verifies that the real local database is unchanged.

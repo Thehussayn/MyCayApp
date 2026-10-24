@@ -95,7 +95,7 @@ export function verifySessionToken(token: string): SessionPayload | null {
     if (
       payload.preview &&
       process.env.NODE_ENV === "production" &&
-      process.env.ENABLE_PREVIEW !== "true"
+      process.env.ENABLE_PREVIEW !== "true" && process.env.DEMO_MODE !== "true"
     )
       return null;
     return payload;

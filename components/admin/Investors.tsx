@@ -235,7 +235,7 @@ export default function Investors({
                   <button
                     key={s}
                     className={`action ${s === "APPROVED" ? "" : "secondary"}`}
-                    disabled={busy || (s === "APPROVED" && !["GOVERNMENT_ID", "PROOF_OF_ADDRESS", "SPECIMEN_SIGNATURE"].every((type) => selected.documents.some((d: any) => d.documentType === type && d.status === "APPROVED")))}
+                    disabled={busy || (s === "APPROVED" && !data.hostedDemo && !["GOVERNMENT_ID", "PROOF_OF_ADDRESS", "SPECIMEN_SIGNATURE"].every((type) => selected.documents.some((d: any) => d.documentType === type && d.status === "APPROVED")))}
                     onClick={() =>
                       act({
                         action: "REVIEW",

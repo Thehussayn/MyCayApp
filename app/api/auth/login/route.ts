@@ -1,3 +1,5 @@
+import crypto from "crypto";
+import { isHostedDemo } from "@/lib/demo/state";
 import { NextRequest, NextResponse } from "next/server";
 import { findUserByEmail, updateUser, recordAuditLog } from "@/lib/db";
 import { verifyPassword } from "@/lib/auth/password";
@@ -105,7 +107,7 @@ export async function POST(req: NextRequest) {
     });
 
     // Create session token
-    const token = signSession(updatedUser);
+    const token = signSession(updatedUser, 7200, isHostedDemo(), isHostedDemo() ? crypto.randomUUID() : undefined);
 
     const response = NextResponse.json({
       success: true,

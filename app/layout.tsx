@@ -115,6 +115,11 @@ export default function RootLayout({
         />
       </head>
       <body className="flex flex-col min-h-screen bg-[#FDFDFD] text-[#252A2D]">
+        {process.env.DEMO_MODE === "true" && (
+          <div className="bg-[#F4EDDE] text-[#252A2D] px-4 py-3 text-center text-sm">
+            Demo environment. Use fictitious details. Accounts and changes belong to this browser and expire after two hours.
+          </div>
+        )}
         <Navbar />
         <main className="flex-1">{children}</main>
         <Footer />

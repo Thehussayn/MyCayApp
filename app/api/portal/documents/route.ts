@@ -1,3 +1,4 @@
+import { isHostedDemo } from "@/lib/demo/state";
 import { NextRequest, NextResponse } from "next/server";
 import { getSession } from "@/lib/auth/session";
 import {
@@ -67,6 +68,7 @@ export async function GET(req: NextRequest) {
 }
 
 export async function POST(req: NextRequest) {
+  if (isHostedDemo()) return NextResponse.json({ error: "Uploads are disabled in this hosted demo. You can continue without a file." }, { status: 400 });
   try {
     const session = await getSession();
     if (!session || !session.userId) {

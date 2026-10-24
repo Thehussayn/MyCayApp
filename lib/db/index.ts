@@ -1,4 +1,5 @@
 import fs from "fs";
+import { isHostedDemo, readDemoState, writeDemoState } from "@/lib/demo/state";
 import { readSessionToken } from "@/lib/auth/session";
 import path from "path";
 import crypto from "crypto";
@@ -97,6 +98,14 @@ export function getInitialDb(): DatabaseSchema {
 }
 
 export function getDb(): DatabaseSchema {
+  if (isHostedDemo()) {
+    const existing = readDemoState();
+    if (existing) return existing;
+    const initial = getInitialDb();
+    initial.users = [];
+    initial.auditLogs = [];
+    return initial;
+  }
   ensureDirectoryExists();
   const DB_PATH = databasePath();
 
@@ -129,6 +138,7 @@ export function getDb(): DatabaseSchema {
 }
 
 export function saveDb(data: DatabaseSchema): void {
+  if (isHostedDemo()) { writeDemoState(data); return; }
   ensureDirectoryExists();
   const DB_PATH = databasePath();
   const tempPath = `${DB_PATH}.tmp.${Date.now()}`;

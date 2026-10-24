@@ -11,7 +11,8 @@
     "test:integration": "node scripts/verify-platform.mjs",
     "test:responsive": "node scripts/verify-responsive.mjs",
     "test:kyc": "node scripts/verify-kyc-flow.mjs",
-    "dev:preview": "NEXT_DIST_DIR=.next-preview next dev --hostname 127.0.0.1 --port 3102"
+    "dev:preview": "NEXT_DIST_DIR=.next-preview next dev --hostname 127.0.0.1 --port 3102",
+    "test:hosted-demo": "node scripts/verify-hosted-demo.mjs"
   },
   "dependencies": {
     "clsx": "^2.1.1",

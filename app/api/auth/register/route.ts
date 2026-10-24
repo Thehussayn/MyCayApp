@@ -3,10 +3,15 @@ import { findUserByEmail, createUser, recordAuditLog } from "@/lib/db";
 import { hashPassword, isPasswordValid } from "@/lib/auth/password";
 import { sendRegistrationAcknowledgement } from "@/lib/email";
 import crypto from "crypto";
+import { isHostedDemo } from "@/lib/demo/state";
 import { signSession, SESSION_COOKIE_NAME } from "@/lib/auth/session";
 
 export async function POST(req: NextRequest) {
   try {
+    if (process.env.NODE_ENV === "production" && !process.env.SESSION_SECRET) {
+      console.error("Registration unavailable: SESSION_SECRET is missing.");
+      return NextResponse.json({ error: "Registration is temporarily unavailable. Please contact support." }, { status: 503 });
+    }
     const body = await req.json();
     const {
       fullName,
@@ -161,7 +166,7 @@ export async function POST(req: NextRequest) {
       },
       { status: 201 },
     );
-    response.cookies.set(SESSION_COOKIE_NAME, signSession(newUser), {
+    response.cookies.set(SESSION_COOKIE_NAME, signSession(newUser, 7200, isHostedDemo(), isHostedDemo() ? crypto.randomUUID() : undefined), {
       httpOnly: true, secure: process.env.NODE_ENV === "production",
       sameSite: "lax", path: "/", maxAge: 7200,
     });

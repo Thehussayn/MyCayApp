@@ -1,3 +1,4 @@
+import { isHostedDemo } from "@/lib/demo/state";
 import { NextRequest, NextResponse } from "next/server";
 import { biodataSteps } from "@/lib/kyc/fields";
 import { validateNuban } from "@/lib/kyc/nuban";
@@ -91,6 +92,7 @@ export function GET(req: NextRequest) {
     });
   if (section === "investors" || section === "review")
     return NextResponse.json({
+      hostedDemo: isHostedDemo(),
       investors: db.users
         .filter((u) => u.role === "INVESTOR")
         .map((u) => ({
@@ -388,7 +390,7 @@ export async function POST(req: NextRequest) {
       if (!bio?.isSubmitted || !["SUBMITTED", "BIODATA_SUBMITTED", "UNDER_REVIEW", "INFO_REQUESTED", "REJECTED"].includes(target.kycStatus || ""))
         throw Error("The investor must submit the seven-step KYC before review.");
       const docs = db.kycDocuments.filter((d) => d.userId === target!.id);
-      if (body.status === "APPROVED" && !["GOVERNMENT_ID", "PROOF_OF_ADDRESS", "SPECIMEN_SIGNATURE"].every((type) => docs.some((d) => d.documentType === type && d.status === "APPROVED")))
+      if (!isHostedDemo() && body.status === "APPROVED" && !["GOVERNMENT_ID", "PROOF_OF_ADDRESS", "SPECIMEN_SIGNATURE"].every((type) => docs.some((d) => d.documentType === type && d.status === "APPROVED")))
         throw Error("Approve all required documents before approving KYC.");
       const before = target.kycStatus;
       target.kycStatus = body.status === "DECLINED" ? "REJECTED" : body.status;

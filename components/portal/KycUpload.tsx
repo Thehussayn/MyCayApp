@@ -10,6 +10,8 @@ export default function KycUpload({
   title: string;
   userId?: string;
 }) {
+  const [hostedDemo, setHostedDemo] = useState(false);
+  useEffect(() => { fetch("/api/auth/me").then((r) => r.json()).then((d) => setHostedDemo(!!d.hostedDemo)).catch(() => {}); }, []);
   const [doc, setDoc] = useState<any>(null),
     [error, setError] = useState(""),
     [busy, setBusy] = useState(false);
@@ -53,6 +55,12 @@ export default function KycUpload({
       setBusy(false);
     }
   }
+  if (hostedDemo) return (
+    <div className="border border-dashed border-neutral-300 rounded-xl p-4 space-y-2">
+      <p className="text-sm font-medium">{title}</p>
+      <p className="text-sm text-neutral-500">Uploads are disabled in this hosted demo. You can continue without a file.</p>
+    </div>
+  );
   return (
     <div className="border border-dashed border-neutral-300 rounded-xl p-4 space-y-3">
       <label className="field">

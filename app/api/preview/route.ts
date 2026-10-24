@@ -2,7 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import fs from "fs";
 import path from "path";
 import crypto from "crypto";
-import { getInitialDb } from "@/lib/db";
+import { getInitialDb, getDb, saveDb } from "@/lib/db";
+import { isHostedDemo } from "@/lib/demo/state";
 import {
   getCurrentSession,
   signSession,
@@ -12,7 +13,7 @@ import { User, UserRole } from "@/lib/db/types";
 export async function POST(req: NextRequest) {
   if (
     process.env.NODE_ENV === "production" &&
-    process.env.ENABLE_PREVIEW !== "true"
+    process.env.ENABLE_PREVIEW !== "true" && !isHostedDemo()
   )
     return NextResponse.json(
       { error: "Preview is disabled." },
@@ -31,12 +32,17 @@ export async function POST(req: NextRequest) {
     `preview-${workspace}.json`,
   );
   let db;
-  if (fs.existsSync(filename))
+  if (isHostedDemo()) {
+    db = getDb();
+  } else if (fs.existsSync(filename))
     db = JSON.parse(fs.readFileSync(filename, "utf8"));
   else {
     db = getInitialDb();
     db.users = [];
     db.auditLogs = [];
+    fs.mkdirSync(path.dirname(filename), { recursive: true });
+    fs.writeFileSync(filename, JSON.stringify(db, null, 2));
+  }
     for (const r of [
       "INVESTOR",
       "STAFF",
@@ -44,6 +50,7 @@ export async function POST(req: NextRequest) {
       "ADMIN",
       "SUPER_ADMIN",
     ] as UserRole[]) {
+      if (db.users.some((u: User) => u.role === r)) continue;
       const user: User = {
         id: `preview_${r}`,
         fullName:
@@ -67,9 +74,8 @@ export async function POST(req: NextRequest) {
       };
       db.users.push(user);
     }
-    fs.mkdirSync(path.dirname(filename), { recursive: true });
-    fs.writeFileSync(filename, JSON.stringify(db, null, 2));
-  }
+  if (isHostedDemo()) saveDb(db);
+  else fs.writeFileSync(filename, JSON.stringify(db, null, 2));
   const user = db.users.find((u: User) => u.role === role)!;
   const response = NextResponse.json({
     redirect: role === "INVESTOR" ? "/portal/dashboard" : "/admin",
