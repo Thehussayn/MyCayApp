@@ -1,0 +1,307 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@font-face {
+  font-family: "Satoshi Variable";
+  src: url("/fonts/Satoshi-Variable.ttf") format("truetype");
+  font-weight: 300 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+:root {
+  --brand-gold: #be933c;
+  --brand-gold-champagne: #b79a5e;
+  --brand-charcoal: #252a2d;
+  --brand-neutral-bg: #f5f9fc;
+  --brand-canvas: #fdfdfd;
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    color-scheme: light;
+  }
+
+  body {
+    @apply bg-[#FDFDFD] text-[#252A2D] antialiased selection:bg-[#BE933C]/20 selection:text-[#252A2D];
+    font-family:
+      "Satoshi Variable",
+      system-ui,
+      -apple-system,
+      BlinkMacSystemFont,
+      "Segoe UI",
+      Roboto,
+      sans-serif;
+  }
+
+  /* Headings strictly use Satoshi */
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6,
+  .font-heading {
+    font-family:
+      "Satoshi Variable",
+      system-ui,
+      -apple-system,
+      BlinkMacSystemFont,
+      sans-serif !important;
+    letter-spacing: -0.03em;
+  }
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #252a2d;
+}
+::-webkit-scrollbar-thumb {
+  background: #2e2e2e;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #be933c;
+}
+
+/* Focus styling */
+:focus-visible {
+  outline: 2px solid #be933c;
+  outline-offset: 2px;
+}
+
+/* Shared application surfaces. */
+.workspace {
+  background: #f6f7f6;
+  color: #252a2d;
+  font-family: "Satoshi Variable", sans-serif;
+}
+.workspace-header {
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 76px;
+  padding: 16px 24px;
+  background: rgba(255, 255, 255, 0.97);
+  border-bottom: 1px solid #e5e7e7;
+}
+.workspace-nav {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  min-height: 44px;
+  border-radius: 8px;
+  font-size: 14px;
+  color: #62696c;
+  transition: background 0.15s;
+}
+.workspace-nav:hover {
+  background: #f5f6f5;
+  color: #252a2d;
+}
+.workspace-nav.active {
+  background: #f4edde;
+  color: #69501e;
+  font-weight: 650;
+}
+.workspace-title {
+  font-size: clamp(24px, 3vw, 32px);
+  font-weight: 700;
+  line-height: 1.2;
+}
+.workspace .font-mono {
+  font-family: inherit;
+  letter-spacing: normal;
+}
+.workspace .rounded-sm {
+  border-radius: 10px;
+}
+.workspace input:not([type="checkbox"]):not([type="radio"]),
+.workspace select,
+.workspace textarea {
+  max-width: 100%;
+  min-width: 0;
+  font-size: 16px;
+}
+.workspace button,
+.workspace a {
+  touch-action: manipulation;
+}
+.workspace table {
+  font-size: 14px;
+}
+.workspace th {
+  font-weight: 600;
+  color: #62696c;
+  text-align: left;
+}
+.workspace th,
+.workspace td {
+  padding: 14px 16px;
+  border-bottom: 1px solid #eceeec;
+}
+.workspace .data-table {
+  overflow-x: auto;
+  width: 100%;
+}
+.workspace .data-table table {
+  min-width: 650px;
+  width: 100%;
+}
+.panel {
+  border: 1px solid #e4e7e5;
+  background: white;
+  border-radius: 14px;
+  padding: 24px;
+  min-width: 0;
+}
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  min-width: 0;
+}
+.field input,
+.field select,
+.field textarea {
+  border: 1px solid #d6dbd8;
+  border-radius: 8px;
+  padding: 12px;
+  width: 100%;
+  background: white;
+  font-weight: 400;
+}
+.action {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 10px 18px;
+  border-radius: 8px;
+  background: #252a2d;
+  color: white;
+  font-weight: 600;
+  font-size: 14px;
+  text-align: center;
+}
+.action:hover {
+  background: #373e42;
+}
+.action:disabled {
+  opacity: 0.5;
+  cursor: wait;
+}
+.action.secondary {
+  background: white;
+  border: 1px solid #d6dbd8;
+  color: #252a2d;
+}
+.icon-button {
+  display: inline-flex;
+  width: 44px;
+  height: 44px;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  border-radius: 8px;
+}
+.icon-button:hover {
+  background: #f4f5f4;
+}
+.status {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  padding: 4px 10px;
+  font-size: 12px;
+  font-weight: 600;
+  background: #f0f2f0;
+  color: #4a5550;
+  text-transform: capitalize;
+}
+.status.active,
+.status.approved,
+.status.completed {
+  background: #eaf4ed;
+  color: #286340;
+}
+.status.funded,
+.status.pending_review,
+.status.in_notice_period {
+  background: #fbf3de;
+  color: #80611c;
+}
+.preview-bar {
+  padding: 9px 24px;
+  background: #fbf5e8;
+  border-bottom: 1px solid #ead9b5;
+  font-size: 12px;
+}
+.preview-bar select {
+  background: transparent;
+  border: 1px solid #d9c69f;
+  border-radius: 5px;
+  padding: 5px;
+  text-transform: capitalize;
+  max-width: 130px;
+}
+.preview-bar a,
+.preview-bar button {
+  text-decoration: underline;
+  min-height: 32px;
+  display: inline-flex;
+  align-items: center;
+}
+.workspace .error {
+  padding: 12px 16px;
+  color: #9d2836;
+  background: #fff0f1;
+  border-radius: 8px;
+  font-size: 14px;
+}
+.workspace .notice {
+  padding: 16px;
+  background: #fbf5e8;
+  border: 1px solid #efdfba;
+  border-radius: 10px;
+  font-size: 14px;
+}
+@media (max-width: 640px) {
+  .panel {
+    padding: 18px;
+  }
+  .workspace-header {
+    padding: 12px 16px;
+    min-height: 68px;
+  }
+  .preview-bar {
+    padding: 8px 16px;
+  }
+  .workspace th,
+  .workspace td {
+    padding: 12px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

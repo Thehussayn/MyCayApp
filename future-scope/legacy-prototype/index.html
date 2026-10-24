@@ -1,0 +1,1110 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full bg-slate-50">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>MyCayApp by Jeje-Ola — Real Estate Investment Platform</title>
+
+  <!-- SEO & Meta Tags -->
+  <meta name="description" content="MyCayApp by Jeje-Ola is a digital investment platform for real-estate-backed opportunities, guaranteed cash flow, and asset management in Nigeria.">
+  <meta property="og:title" content="MyCayApp by Jeje-Ola — Premium Real Estate Investments">
+  <meta property="og:description" content="Invest in real-estate-backed opportunities, track earnings, monthly payouts, and investment documents.">
+  <meta property="og:type" content="website">
+  <meta name="theme-color" content="#1F1F1F">
+
+  <!-- PWA Manifest -->
+  <link rel="manifest" href="manifest.json">
+
+  <!-- Google Fonts: Outfit (Headings), Inter (UI), JetBrains Mono (Financial Metrics) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600;700&family=Outfit:wght@600;700;800;900&display=swap" rel="stylesheet">
+
+  <!-- Tailwind CSS Engine for Utility Layouts -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brandGold: '#C59B27',
+            brandGoldDark: '#9A761C',
+            brandGoldLight: '#FDF8EB',
+            brandCharcoal: '#1F1F1F',
+            brandCharcoalDark: '#121212',
+            brandCharcoalLight: '#2A2A2A',
+          },
+          fontFamily: {
+            sans: ['Inter', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace'],
+            heading: ['Outfit', 'Inter', 'sans-serif']
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Lucide Icon System -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <!-- MyCayApp Premium Custom Styles -->
+  <link rel="stylesheet" href="css/variables.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/views.css">
+</head>
+<body class="flex flex-col min-h-screen text-slate-900 font-sans antialiased bg-slate-50">
+
+  <!-- ==========================================
+       TOP APP HEADER & NAVIGATION BAR
+       ========================================== -->
+  <header class="sticky top-0 z-50 w-full bg-[#1F1F1F] border-b border-white/10 shadow-lg">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-18 flex items-center justify-between gap-4">
+      
+      <!-- Brand Logo & Official Emblem -->
+      <div class="flex items-center gap-3 cursor-pointer" onclick="window.app.switchView('public-landing')">
+        <div class="w-10 h-10 rounded-lg bg-[#C59B27] flex items-center justify-center shadow-md shadow-[#C59B27]/30 transition-transform hover:scale-105">
+          <!-- Official Dual-Bar Geometric "M" Emblem -->
+          <svg class="w-6 h-6 fill-white" viewBox="0 0 24 24">
+            <path d="M4 18L10 6H13.5L7.5 18H4Z"/>
+            <path d="M11 18L17 6H20.5L14.5 18H11Z"/>
+            <path d="M14.5 18L17.5 12H21L18 18H14.5Z"/>
+          </svg>
+        </div>
+        <div class="flex flex-col">
+          <span class="font-heading font-extrabold text-xl tracking-tight text-white leading-none">
+            MyCay<span class="text-[#C59B27]">App</span>
+          </span>
+          <span class="text-[10px] font-bold text-[#C59B27] tracking-widest uppercase mt-0.5">BY JEJE-OLA</span>
+        </div>
+      </div>
+
+      <!-- Desktop Navigation Center Bar -->
+      <nav class="hidden md:flex items-center gap-1 bg-white/5 p-1.5 rounded-full border border-white/10">
+        <button class="desktop-nav-link nav-link-btn active" data-view="public-landing">
+          <i data-lucide="home" class="w-4 h-4"></i>
+          <span>Home</span>
+        </button>
+        <button class="desktop-nav-link nav-link-btn" data-view="onboarding-wizard">
+          <i data-lucide="user-check" class="w-4 h-4"></i>
+          <span>7-Step Onboarding</span>
+        </button>
+        <button class="desktop-nav-link nav-link-btn" data-view="investor-overview">
+          <i data-lucide="pie-chart" class="w-4 h-4"></i>
+          <span>Investor Portal</span>
+        </button>
+        <button class="desktop-nav-link nav-link-btn" data-view="staff-kanban">
+          <i data-lucide="users" class="w-4 h-4"></i>
+          <span>Staff CRM</span>
+        </button>
+        <button class="desktop-nav-link nav-link-btn" data-view="finance-ledger">
+          <i data-lucide="receipt" class="w-4 h-4"></i>
+          <span>Finance Desk</span>
+        </button>
+      </nav>
+
+      <!-- Right Header Actions -->
+      <div class="flex items-center gap-3">
+        <!-- Live NGN/USD Currency Switcher -->
+        <div class="inline-flex rounded-full border border-white/15 bg-black/30 p-1 text-xs font-mono">
+          <button id="curr-ngn" class="px-2.5 py-1 rounded-full text-slate-900 bg-white font-bold cursor-pointer transition-all">NGN</button>
+          <button id="curr-usd" class="px-2.5 py-1 rounded-full text-zinc-400 hover:text-white cursor-pointer transition-all">USD</button>
+        </div>
+
+        <!-- Role Switcher Dropdown -->
+        <select id="role-switcher" class="h-9 rounded-lg border border-white/15 bg-white/10 px-3 text-xs font-mono text-white focus:outline-none focus:border-[#C59B27] cursor-pointer">
+          <option value="public">Public Portal</option>
+          <option value="investor" selected>Investor View</option>
+          <option value="staff">Staff Operations</option>
+          <option value="finance">Finance Desk</option>
+          <option value="admin">Admin View</option>
+        </select>
+
+        <!-- User Profile Avatar -->
+        <div class="w-9 h-9 rounded-full bg-[#C59B27] text-white flex items-center justify-center font-mono font-bold text-xs shadow-md shadow-[#C59B27]/20 border border-white/20">
+          BA
+        </div>
+      </div>
+
+    </div>
+  </header>
+
+  <!-- ==========================================
+       MAIN VIEW CONTAINER
+       ========================================== -->
+  <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 mb-16 md:mb-8">
+
+    <!-- ==========================================
+         VIEW 1: PUBLIC PORTAL & PROPERTY SHOWCASE
+         ========================================== -->
+    <div id="public-landing" class="view-container space-y-12">
+
+      <!-- Hero Banner Section -->
+      <div class="relative overflow-hidden rounded-3xl bg-[#1F1F1F] text-white p-8 sm:p-14 shadow-2xl border border-white/10">
+        <div class="absolute -right-20 -bottom-20 w-96 h-96 bg-[#C59B27]/10 rounded-full blur-3xl pointer-events-none"></div>
+        
+        <div class="relative z-10 max-w-3xl space-y-6">
+          <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#C59B27]/20 border border-[#C59B27]/40 text-[#C59B27] text-xs font-bold font-mono tracking-wide uppercase">
+            <i data-lucide="shield-check" class="w-4 h-4"></i>
+            <span>Verified Real Estate Investment Platform</span>
+          </div>
+
+          <h1 class="font-heading text-4xl sm:text-5xl font-black text-white tracking-tight leading-none">
+            Build Wealth with <span class="text-transparent bg-clip-text bg-gradient-to-r from-[#DFAC36] via-[#C59B27] to-[#9A761C]">Physical Property</span> & Guaranteed ROI
+          </h1>
+
+          <p class="text-sm sm:text-base text-slate-300 leading-relaxed max-w-2xl">
+            MyCayApp by Jeje-Ola allows investors to co-own prime commercial real estate with title backing or earn up to <span class="font-bold text-white">24% p.a. fixed monthly cash flow</span>. Fully backed by legal contracts and automated monthly reporting.
+          </p>
+
+          <div class="pt-2 flex flex-col sm:flex-row items-center gap-4">
+            <button class="btn-mycay btn-mycay-primary w-full sm:w-auto px-8" onclick="window.app.switchView('onboarding-wizard')">
+              <span>Start 7-Step Investor Onboarding</span>
+              <i data-lucide="arrow-right" class="w-4 h-4"></i>
+            </button>
+
+            <button class="btn-mycay btn-mycay-dark w-full sm:w-auto px-8" onclick="window.app.switchView('investor-overview')">
+              <i data-lucide="layout-dashboard" class="w-4 h-4"></i>
+              <span>Open Investor Portal</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Real Estate Search & Filter Bar (Inspired by Nigeria Property Centre) -->
+      <div class="bg-white rounded-2xl p-4 sm:p-6 shadow-xl border border-slate-200 space-y-4">
+        <div class="flex items-center justify-between pb-2 border-b border-slate-100">
+          <div class="flex items-center gap-2 font-heading font-bold text-base text-slate-900">
+            <i data-lucide="search" class="w-5 h-5 text-[#C59B27]"></i>
+            <span>Filter Investment Opportunities</span>
+          </div>
+          <span class="text-xs font-mono font-semibold text-slate-500">NIGERIA PROPERTY CENTRE DESIGN STANDARD</span>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div>
+            <label class="block text-xs font-mono font-bold uppercase text-slate-600 mb-1">Product Model</label>
+            <select id="filter-product" class="w-full h-11 rounded-lg border border-slate-300 px-3 text-xs font-semibold focus:border-[#C59B27] focus:outline-none">
+              <option value="all">All Plans (GIAP & WealthStream)</option>
+              <option value="GIAP">GIAP (Asset-Backed Property Split)</option>
+              <option value="WealthStream">WealthStream (Fixed Monthly Cash Flow)</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="block text-xs font-mono font-bold uppercase text-slate-600 mb-1">Target Location</label>
+            <select id="filter-location" class="w-full h-11 rounded-lg border border-slate-300 px-3 text-xs font-semibold focus:border-[#C59B27] focus:outline-none">
+              <option value="all">All Prime Locations</option>
+              <option value="Lekki Phase 1">Lekki Phase 1, Lagos</option>
+              <option value="Victoria Island">Victoria Island, Lagos</option>
+              <option value="Ikeja GRA">Ikeja GRA, Lagos</option>
+              <option value="Abuja CBD">Abuja CBD, FCT</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="block text-xs font-mono font-bold uppercase text-slate-600 mb-1">Minimum Capital</label>
+            <select id="filter-capital" class="w-full h-11 rounded-lg border border-slate-300 px-3 text-xs font-semibold focus:border-[#C59B27] focus:outline-none">
+              <option value="all">Any Amount</option>
+              <option value="5000000">₦5,000,000 (5 Million NGN)</option>
+              <option value="10000000">₦10,000,000 (10 Million NGN)</option>
+              <option value="25000000">₦25,000,000 (25 Million NGN)</option>
+            </select>
+          </div>
+
+          <div class="flex items-end">
+            <button class="btn-mycay btn-mycay-primary w-full h-11" onclick="window.app.filterOpportunities()">
+              <i data-lucide="sliders-horizontal" class="w-4 h-4"></i>
+              <span>Apply Filters</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Core Investment Product Showcase Grid -->
+      <div class="space-y-6">
+        <div class="flex items-center justify-between">
+          <div>
+            <h2 class="font-heading text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
+              Featured Investment Offerings
+            </h2>
+            <p class="text-xs sm:text-sm text-slate-500 mt-1">Select an opportunity backed by prime physical property or guaranteed fixed returns.</p>
+          </div>
+          <span class="hidden sm:inline-flex badge-mycay badge-gold">
+            <i data-lucide="check-circle-2" class="w-3.5 h-3.5"></i>
+            SCUML / AML Compliant
+          </span>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          
+          <!-- PRODUCT 1: GIAP -->
+          <div class="property-card">
+            <div class="property-thumb" style="background-image: url('https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=1200&q=80');">
+              <div class="property-thumb-overlay"></div>
+              <span class="property-badge-type">GIAP REAL ESTATE</span>
+              <span class="property-badge-return">70/30 PROFIT SPLIT</span>
+              
+              <div class="property-thumb-info">
+                <h3 class="font-heading font-extrabold text-xl text-white">Lekki Premium Luxury Residences</h3>
+                <div class="property-location text-slate-200">
+                  <i data-lucide="map-pin" class="w-3.5 h-3.5 text-[#C59B27]"></i>
+                  <span>Lekki-Epe Expressway, Lekki Phase 1, Lagos</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="p-6 space-y-4 flex-1 flex flex-col justify-between">
+              <div>
+                <p class="text-xs text-slate-600 leading-relaxed">
+                  Capital deployment directly backed by physical property title deed. Profits recorded on property resale with 70% allocated to investor and 30% to developer.
+                </p>
+
+                <div class="mt-4 space-y-2">
+                  <div class="flex justify-between text-xs font-mono font-bold text-slate-700">
+                    <span>Units Allocated: 8 of 10</span>
+                    <span class="text-[#C59B27]">80% Funded</span>
+                  </div>
+                  <div class="progress-bar-container">
+                    <div class="progress-bar-fill" style="width: 80%;"></div>
+                  </div>
+                </div>
+
+                <ul class="mt-4 space-y-2 text-xs text-slate-700">
+                  <li class="flex items-center gap-2">
+                    <i data-lucide="check" class="w-4 h-4 text-[#C59B27] shrink-0"></i>
+                    <span>Direct physical property allocation & title backing</span>
+                  </li>
+                  <li class="flex items-center gap-2">
+                    <i data-lucide="check" class="w-4 h-4 text-[#C59B27] shrink-0"></i>
+                    <span>70% Investor / 30% Developer capital appreciation split</span>
+                  </li>
+                  <li class="flex items-center gap-2">
+                    <i data-lucide="check" class="w-4 h-4 text-[#C59B27] shrink-0"></i>
+                    <span>Quarterly property valuation statements & reports</span>
+                  </li>
+                </ul>
+              </div>
+
+              <button class="mt-6 btn-mycay btn-mycay-primary w-full" onclick="window.app.openNewInvestmentModal('GIAP')">
+                <span>Subscribe to GIAP Plan</span>
+                <i data-lucide="chevron-right" class="w-4 h-4"></i>
+              </button>
+            </div>
+          </div>
+
+          <!-- PRODUCT 2: WEALTHSTREAM -->
+          <div class="property-card">
+            <div class="property-thumb" style="background-image: url('https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&w=1200&q=80');">
+              <div class="property-thumb-overlay"></div>
+              <span class="property-badge-type">WEALTHSTREAM FIXED</span>
+              <span class="property-badge-return">24% P.A. FIXED ROI</span>
+              
+              <div class="property-thumb-info">
+                <h3 class="font-heading font-extrabold text-xl text-white">WealthStream High-Yield Income Plan</h3>
+                <div class="property-location text-slate-200">
+                  <i data-lucide="trending-up" class="w-3.5 h-3.5 text-[#C59B27]"></i>
+                  <span>Guaranteed Cash Flow • Monthly Payouts on 1st</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="p-6 space-y-4 flex-1 flex flex-col justify-between">
+              <div>
+                <p class="text-xs text-slate-600 leading-relaxed">
+                  Fixed income product for cash flow seekers. Yields 24% annual returns paid directly into your verified bank account on the 1st of every month.
+                </p>
+
+                <!-- Interactive Worked Yield Calculator -->
+                <div class="mt-4 p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-3">
+                  <div class="flex items-center justify-between text-xs font-mono">
+                    <span class="text-slate-500 font-bold uppercase">Worked Return Calculator</span>
+                    <span class="text-[#C59B27] font-bold">24% Annual Return</span>
+                  </div>
+                  <div class="flex items-center justify-between">
+                    <div>
+                      <span class="text-[10px] text-slate-400 font-mono block">SAMPLE INVESTMENT</span>
+                      <span class="font-mono text-base font-bold text-slate-900">₦10,000,000</span>
+                    </div>
+                    <div class="text-right">
+                      <span class="text-[10px] text-slate-400 font-mono block">MONTHLY CASH FLOW</span>
+                      <span class="font-mono text-base font-bold text-[#C59B27]">₦200,000 / month</span>
+                    </div>
+                  </div>
+                </div>
+
+                <ul class="mt-4 space-y-2 text-xs text-slate-700">
+                  <li class="flex items-center gap-2">
+                    <i data-lucide="check" class="w-4 h-4 text-[#C59B27] shrink-0"></i>
+                    <span>Guaranteed monthly payout transferred every 1st of month</span>
+                  </li>
+                  <li class="flex items-center gap-2">
+                    <i data-lucide="check" class="w-4 h-4 text-[#C59B27] shrink-0"></i>
+                    <span>Auto-generated digital investment contract (PDF format)</span>
+                  </li>
+                  <li class="flex items-center gap-2">
+                    <i data-lucide="check" class="w-4 h-4 text-[#C59B27] shrink-0"></i>
+                    <span>Monthly account statements generated automatically</span>
+                  </li>
+                </ul>
+              </div>
+
+              <button class="mt-6 btn-mycay btn-mycay-outline w-full" onclick="window.app.openNewInvestmentModal('WealthStream')">
+                <span>Subscribe to WealthStream</span>
+                <i data-lucide="chevron-right" class="w-4 h-4"></i>
+              </button>
+            </div>
+
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ==========================================
+         VIEW 2: 7-STEP INVESTOR BIODATA WIZARD
+         ========================================== -->
+    <div id="onboarding-wizard" class="view-container hidden max-w-4xl mx-auto space-y-6">
+      <div class="bg-white rounded-3xl p-6 sm:p-10 shadow-2xl border border-slate-200 space-y-8">
+        
+        <!-- Header & Stepper Info -->
+        <div class="text-center space-y-2">
+          <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#C59B27]/15 text-[#C59B27] font-mono text-xs font-bold uppercase">
+            <i data-lucide="user-plus" class="w-3.5 h-3.5"></i>
+            <span>Investor KYC & Compliance Wizard</span>
+          </div>
+          <h2 id="wizard-step-label" class="font-heading text-2xl sm:text-3xl font-extrabold text-slate-900">
+            Step 1 of 7: Personal Information
+          </h2>
+          <p id="wizard-step-sublabel" class="text-xs sm:text-sm text-slate-500">
+            Enter your legal profile information as it appears on your government identification.
+          </p>
+        </div>
+
+        <!-- 7-Node Visual Stepper Bar -->
+        <div class="space-y-2">
+          <div class="grid grid-cols-7 gap-1.5 text-center">
+            <div id="step-node-1" class="step-indicator-item space-y-1 active">
+              <div class="h-2 rounded-full bg-[#C59B27] transition-all"></div>
+              <span class="text-[9px] font-mono font-bold text-[#C59B27] block truncate">1. Personal</span>
+            </div>
+            <div id="step-node-2" class="step-indicator-item space-y-1">
+              <div class="h-2 rounded-full bg-slate-200 transition-all"></div>
+              <span class="text-[9px] font-mono text-slate-400 block truncate">2. Contact</span>
+            </div>
+            <div id="step-node-3" class="step-indicator-item space-y-1">
+              <div class="h-2 rounded-full bg-slate-200 transition-all"></div>
+              <span class="text-[9px] font-mono text-slate-400 block truncate">3. Identity</span>
+            </div>
+            <div id="step-node-4" class="step-indicator-item space-y-1">
+              <div class="h-2 rounded-full bg-slate-200 transition-all"></div>
+              <span class="text-[9px] font-mono text-slate-400 block truncate">4. Occupation</span>
+            </div>
+            <div id="step-node-5" class="step-indicator-item space-y-1">
+              <div class="h-2 rounded-full bg-slate-200 transition-all"></div>
+              <span class="text-[9px] font-mono text-slate-400 block truncate">5. Next of Kin</span>
+            </div>
+            <div id="step-node-6" class="step-indicator-item space-y-1">
+              <div class="h-2 rounded-full bg-slate-200 transition-all"></div>
+              <span class="text-[9px] font-mono text-slate-400 block truncate">6. Bank NUBAN</span>
+            </div>
+            <div id="step-node-7" class="step-indicator-item space-y-1">
+              <div class="h-2 rounded-full bg-slate-200 transition-all"></div>
+              <span class="text-[9px] font-mono text-slate-400 block truncate">7. Documents</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 7-Step Dynamic Form Engine -->
+        <form id="form-onboarding-wizard" onsubmit="event.preventDefault();" class="space-y-6 pt-2">
+          
+          <!-- STEP 1: PERSONAL INFO -->
+          <div id="wizard-step-content-1" class="space-y-4">
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <div class="space-y-1">
+                <label class="block text-xs font-mono uppercase font-bold text-slate-700">Title</label>
+                <select class="w-full h-11 rounded-lg border border-slate-300 px-3 text-xs font-semibold focus:border-[#C59B27] focus:outline-none">
+                  <option>Chief</option>
+                  <option>Mr.</option>
+                  <option>Mrs.</option>
+                  <option>Dr.</option>
+                  <option>Prof.</option>
+                </select>
+              </div>
+              <div class="space-y-1">
+                <label class="block text-xs font-mono uppercase font-bold text-slate-700">Surname (Last Name)</label>
+                <input type="text" class="w-full h-11 rounded-lg border border-slate-300 px-3 text-xs font-semibold focus:border-[#C59B27] focus:outline-none" value="Ola" required>
+              </div>
+              <div class="space-y-1">
+                <label class="block text-xs font-mono uppercase font-bold text-slate-700">First Name</label>
+                <input type="text" class="w-full h-11 rounded-lg border border-slate-300 px-3 text-xs font-semibold focus:border-[#C59B27] focus:outline-none" value="Babatunde" required>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div class="space-y-1">
+                <label class="block text-xs font-mono uppercase font-bold text-slate-700">Date of Birth</label>
+                <input type="date" class="w-full h-11 rounded-lg border border-slate-300 px-3 text-xs font-semibold focus:border-[#C59B27] focus:outline-none" value="1982-06-14" required>
+              </div>
+              <div class="space-y-1">
+                <label class="block text-xs font-mono uppercase font-bold text-slate-700">Gender & Marital Status</label>
+                <div class="grid grid-cols-2 gap-2">
+                  <select class="w-full h-11 rounded-lg border border-slate-300 px-3 text-xs font-semibold focus:border-[#C59B27] focus:outline-none">
+                    <option selected>Male</option>
+                    <option>Female</option>
+                  </select>
+                  <select class="w-full h-11 rounded-lg border border-slate-300 px-3 text-xs font-semibold focus:border-[#C59B27] focus:outline-none">
+                    <option selected>Married</option>
+                    <option>Single</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- STEP 2: CONTACT & ADDRESS -->
+          <div id="wizard-step-content-2" class="space-y-4 hidden">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div class="space-y-1">
+                <label class="block text-xs font-mono uppercase font-bold text-slate-700">Email Address</label>
+                <input type="email" class="w-full h-11 rounded-lg border border-slate-300 px-3 text-xs font-semibold focus:border-[#C59B27] focus:outline-none" value="babatunde.ola@example.com" required>
+              </div>
+              <div class="space-y-1">
+                <label class="block text-xs font-mono uppercase font-bold text-slate-700">Phone Number (WhatsApp)</label>
+                <input type="tel" class="w-full h-11 rounded-lg border border-slate-300 px-3 text-xs font-semibold focus:border-[#C59B27] focus:outline-none" value="+234 803 123 4567" required>
+              </div>
+            </div>
+
+            <div class="space-y-1">
+              <label class="block text-xs font-mono uppercase font-bold text-slate-700">Residential Street Address</label>
+              <input type="text" class="w-full h-11 rounded-lg border border-slate-300 px-3 text-xs font-semibold focus:border-[#C59B27] focus:outline-none" value="14 Admiralty Way, Lekki Phase 1" required>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div class="space-y-1">
+                <label class="block text-xs font-mono uppercase font-bold text-slate-700">City / LGA</label>
+                <input type="text" class="w-full h-11 rounded-lg border border-slate-300 px-3 text-xs font-semibold focus:border-[#C59B27] focus:outline-none" value="Lekki / Eti-Osa" required>
+              </div>
+              <div class="space-y-1">
+                <label class="block text-xs font-mono uppercase font-bold text-slate-700">State of Residence</label>
+                <select class="w-full h-11 rounded-lg border border-slate-300 px-3 text-xs font-semibold focus:border-[#C59B27] focus:outline-none">
+                  <option selected>Lagos State</option>
+                  <option>Abuja FCT</option>
+                  <option>Rivers State</option>
+                  <option>Oyo State</option>
+                  <option>Ogun State</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <!-- STEP 3: IDENTIFICATION -->
+          <div id="wizard-step-content-3" class="space-y-4 hidden">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div class="space-y-1">
+                <label class="block text-xs font-mono uppercase font-bold text-slate-700">Government ID Type</label>
+                <select class="w-full h-11 rounded-lg border border-slate-300 px-3 text-xs font-semibold focus:border-[#C59B27] focus:outline-none">
+                  <option selected>International Passport</option>
+                  <option>National Identity Card (NIMC)</option>
+                  <option>Driver's License</option>
+                  <option>Voter's Card</option>
+                </select>
+              </div>
+              <div class="space-y-1">
+                <label class="block text-xs font-mono uppercase font-bold text-slate-700">ID Document Number</label>
+                <input type="text" class="w-full h-11 rounded-lg border border-slate-300 px-3 text-xs font-semibold focus:border-[#C59B27] focus:outline-none" value="A08912455" required>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div class="space-y-1">
+                <label class="block text-xs font-mono uppercase font-bold text-slate-700">BVN (Bank Verification Number)</label>
+                <input type="text" class="w-full h-11 rounded-lg border border-slate-300 px-3 text-xs font-semibold focus:border-[#C59B27] focus:outline-none" value="22233344455" maxlength="11" required>
+              </div>
+              <div class="space-y-1">
+                <label class="block text-xs font-mono uppercase font-bold text-slate-700">NIN (National Identity Number)</label>
+                <input type="text" class="w-full h-11 rounded-lg border border-slate-300 px-3 text-xs font-semibold focus:border-[#C59B27] focus:outline-none" value="11223344556" maxlength="11" required>
+              </div>
+            </div>
+          </div>
+
+          <!-- STEP 4: OCCUPATION & SOURCE OF FUNDS -->
+          <div id="wizard-step-content-4" class="space-y-4 hidden">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div class="space-y-1">
+                <label class="block text-xs font-mono uppercase font-bold text-slate-700">Employment Status</label>
+                <select class="w-full h-11 rounded-lg border border-slate-300 px-3 text-xs font-semibold focus:border-[#C59B27] focus:outline-none">
+                  <option selected>Self-Employed / Business Owner</option>
+                  <option>Employed (Corporate Executive)</option>
+                  <option>Civil Servant</option>
+                  <option>Retired</option>
+                </select>
+              </div>
+              <div class="space-y-1">
+                <label class="block text-xs font-mono uppercase font-bold text-slate-700">Employer / Business Name</label>
+                <input type="text" class="w-full h-11 rounded-lg border border-slate-300 px-3 text-xs font-semibold focus:border-[#C59B27] focus:outline-none" value="Ola Logistics & Maritime Services" required>
+              </div>
+            </div>
+
+            <div class="space-y-1">
+              <label class="block text-xs font-mono uppercase font-bold text-slate-700">Annual Income Range</label>
+              <select class="w-full h-11 rounded-lg border border-slate-300 px-3 text-xs font-semibold focus:border-[#C59B27] focus:outline-none">
+                <option>₦10,000,000 — ₦25,000,000</option>
+                <option selected>₦25,000,000 — ₦50,000,000</option>
+                <option>₦50,000,000 — ₦100,000,000+</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- STEP 5: NEXT OF KIN -->
+          <div id="wizard-step-content-5" class="space-y-4 hidden">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div class="space-y-1">
+                <label class="block text-xs font-mono uppercase font-bold text-slate-700">Next of Kin Full Name</label>
+                <input type="text" class="w-full h-11 rounded-lg border border-slate-300 px-3 text-xs font-semibold focus:border-[#C59B27] focus:outline-none" value="Mrs. Folashade Ola" required>
+              </div>
+              <div class="space-y-1">
+                <label class="block text-xs font-mono uppercase font-bold text-slate-700">Relationship</label>
+                <select class="w-full h-11 rounded-lg border border-slate-300 px-3 text-xs font-semibold focus:border-[#C59B27] focus:outline-none">
+                  <option selected>Spouse</option>
+                  <option>Child</option>
+                  <option>Sibling</option>
+                  <option>Parent</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div class="space-y-1">
+                <label class="block text-xs font-mono uppercase font-bold text-slate-700">Next of Kin Phone</label>
+                <input type="tel" class="w-full h-11 rounded-lg border border-slate-300 px-3 text-xs font-semibold focus:border-[#C59B27] focus:outline-none" value="+234 802 987 6543" required>
+              </div>
+              <div class="space-y-1">
+                <label class="block text-xs font-mono uppercase font-bold text-slate-700">Next of Kin Address</label>
+                <input type="text" class="w-full h-11 rounded-lg border border-slate-300 px-3 text-xs font-semibold focus:border-[#C59B27] focus:outline-none" value="14 Admiralty Way, Lekki Phase 1, Lagos" required>
+              </div>
+            </div>
+          </div>
+
+          <!-- STEP 6: BANK NUBAN VERIFICATION -->
+          <div id="wizard-step-content-6" class="space-y-4 hidden">
+            <div class="p-4 rounded-xl bg-[#C59B27]/10 border border-[#C59B27]/30 text-xs text-slate-700 leading-relaxed flex items-start gap-3">
+              <i data-lucide="shield-alert" class="w-5 h-5 text-[#C59B27] shrink-0 mt-0.5"></i>
+              <div>
+                <span class="font-bold text-slate-900 block">NUBAN Verification Required</span>
+                Monthly ROI payouts will be automatically credited to this verified bank account.
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div class="space-y-1">
+                <label class="block text-xs font-mono uppercase font-bold text-slate-700">Select Bank</label>
+                <select id="select-bank" class="w-full h-11 rounded-lg border border-slate-300 px-3 text-xs font-semibold focus:border-[#C59B27] focus:outline-none">
+                  <option value="GTBank">Guaranty Trust Bank (GTB)</option>
+                  <option value="FirstBank">First Bank of Nigeria</option>
+                  <option value="Access">Access Bank</option>
+                  <option value="Zenith">Zenith Bank</option>
+                  <option value="Kuda">Kuda Microfinance Bank</option>
+                </select>
+              </div>
+
+              <div class="space-y-1">
+                <label class="block text-xs font-mono uppercase font-bold text-slate-700">10-Digit NUBAN Account Number</label>
+                <div class="flex gap-2">
+                  <input id="input-acc-num" type="text" class="w-full h-11 rounded-lg border border-slate-300 px-3 font-mono font-bold text-sm focus:border-[#C59B27] focus:outline-none" value="0123456789" maxlength="10">
+                  <button type="button" id="btn-nuban-verify" class="btn-mycay btn-mycay-primary shrink-0 px-4 h-11">
+                    <span>Verify</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- NUBAN Verification Result Box -->
+            <div id="nuban-result"></div>
+          </div>
+
+          <!-- STEP 7: DOCUMENTS & SIGNATURE -->
+          <div id="wizard-step-content-7" class="space-y-4 hidden">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div class="space-y-1">
+                <label class="block text-xs font-mono uppercase font-bold text-slate-700">Government ID Upload</label>
+                <div class="border-2 border-dashed border-slate-300 rounded-xl p-5 text-center bg-slate-50 hover:border-[#C59B27] transition-all cursor-pointer" onclick="window.app.showToast('Uploaded: gov_id_babatunde.pdf')">
+                  <i data-lucide="file-check" class="w-8 h-8 text-[#C59B27] mx-auto mb-2"></i>
+                  <span class="text-xs font-mono font-bold text-slate-800 block">gov_id_babatunde.pdf</span>
+                  <span class="text-[10px] text-slate-400">Click to replace file (Max 10MB)</span>
+                </div>
+              </div>
+
+              <div class="space-y-1">
+                <label class="block text-xs font-mono uppercase font-bold text-slate-700">Proof of Residence Document</label>
+                <div class="border-2 border-dashed border-slate-300 rounded-xl p-5 text-center bg-slate-50 hover:border-[#C59B27] transition-all cursor-pointer" onclick="window.app.showToast('Uploaded: utility_bill_2026.pdf')">
+                  <i data-lucide="file-text" class="w-8 h-8 text-[#C59B27] mx-auto mb-2"></i>
+                  <span class="text-xs font-mono font-bold text-slate-800 block">utility_bill_2026.pdf</span>
+                  <span class="text-[10px] text-slate-400">Click to replace file (Max 10MB)</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="space-y-1">
+              <label class="block text-xs font-mono uppercase font-bold text-slate-700">Specimen Signature Upload</label>
+              <div class="border-2 border-dashed border-slate-300 rounded-xl p-5 text-center bg-slate-50 hover:border-[#C59B27] transition-all cursor-pointer" onclick="window.app.showToast('Uploaded: specimen_signature.jpg')">
+                <i data-lucide="pen-tool" class="w-8 h-8 text-[#C59B27] mx-auto mb-2"></i>
+                <span class="text-xs font-mono font-bold text-slate-800 block">specimen_signature.jpg</span>
+                <span class="text-[10px] text-slate-400">Click to upload digital signature image</span>
+              </div>
+            </div>
+
+            <div class="pt-2">
+              <label class="flex items-start gap-2.5 cursor-pointer">
+                <input type="checkbox" checked required class="mt-1 rounded border-slate-300 text-[#C59B27] focus:ring-[#C59B27]">
+                <span class="text-xs text-slate-600 leading-normal">
+                  I hereby declare that all information provided is complete, accurate, and complies with SCUML & AML compliance regulations.
+                </span>
+              </label>
+            </div>
+          </div>
+
+          <!-- Wizard Footer Controls -->
+          <div class="flex items-center justify-between pt-6 border-t border-slate-200">
+            <button type="button" id="btn-wizard-prev" class="btn-mycay btn-mycay-outline hidden">
+              <i data-lucide="chevron-left" class="w-4 h-4"></i>
+              <span>Back</span>
+            </button>
+
+            <div></div>
+
+            <div class="flex items-center gap-3">
+              <button type="button" class="btn-mycay btn-mycay-dark text-xs" onclick="window.app.showToast('Progress saved to session')">
+                <i data-lucide="save" class="w-3.5 h-3.5"></i>
+                <span>Save & Exit</span>
+              </button>
+
+              <button type="button" id="btn-wizard-next" class="btn-mycay btn-mycay-primary">
+                <span>Continue to Step 2</span>
+                <i data-lucide="chevron-right" class="w-4 h-4"></i>
+              </button>
+
+              <button type="button" id="btn-submit-onboarding" class="btn-mycay btn-mycay-primary hidden">
+                <span>Submit Registration & KYC</span>
+                <i data-lucide="check-circle-2" class="w-4 h-4"></i>
+              </button>
+            </div>
+          </div>
+
+        </form>
+
+      </div>
+    </div>
+
+    <!-- ==========================================
+         VIEW 3: INVESTOR PORTAL DASHBOARD
+         ========================================== -->
+    <div id="investor-overview" class="view-container hidden space-y-8">
+      
+      <!-- Metrics Overview Header Banner -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        
+        <!-- Metric Card 1 -->
+        <div class="bg-white rounded-2xl p-6 shadow-xl border border-slate-200 space-y-2 relative overflow-hidden">
+          <div class="absolute top-0 right-0 w-24 h-24 bg-[#C59B27]/10 rounded-full blur-xl pointer-events-none"></div>
+          <div class="flex items-center justify-between text-xs font-mono font-bold text-slate-500 uppercase">
+            <span>Total Capital Invested</span>
+            <i data-lucide="wallet" class="w-4 h-4 text-[#C59B27]"></i>
+          </div>
+          <div id="metric-total-capital" class="font-mono text-3xl font-extrabold text-slate-900">
+            ₦35,000,000
+          </div>
+          <div class="text-xs text-slate-500 pt-1 flex items-center gap-2">
+            <span class="w-2 h-2 rounded-full bg-[#C59B27]"></span>
+            <span><span id="metric-active-plans-count" class="font-bold text-slate-900">2</span> Active Holdings</span>
+          </div>
+        </div>
+
+        <!-- Metric Card 2 -->
+        <div class="bg-white rounded-2xl p-6 shadow-xl border border-slate-200 space-y-2">
+          <div class="flex items-center justify-between text-xs font-mono font-bold text-slate-500 uppercase">
+            <span>Total Earnings to Date</span>
+            <i data-lucide="trending-up" class="w-4 h-4 text-[#C59B27]"></i>
+          </div>
+          <div id="metric-total-earnings" class="font-mono text-3xl font-extrabold text-slate-900">
+            ₦5,575,000
+          </div>
+          <div class="text-xs text-slate-500 pt-1">
+            <span>Next Payout: </span>
+            <span id="metric-next-payout" class="font-bold text-slate-900">₦200,000 (Oct 1, 2026)</span>
+          </div>
+        </div>
+
+        <!-- Metric Card 3 -->
+        <div class="bg-white rounded-2xl p-6 shadow-xl border border-slate-200 space-y-2 sm:col-span-2 lg:col-span-1">
+          <div class="flex items-center justify-between text-xs font-mono font-bold text-slate-500 uppercase">
+            <span>Verified NUBAN Bank</span>
+            <i data-lucide="building" class="w-4 h-4 text-[#C59B27]"></i>
+          </div>
+          <div class="font-mono text-lg font-bold text-slate-900">
+            GTBank • 0123456789
+          </div>
+          <div class="text-xs text-slate-500 pt-1 flex items-center justify-between">
+            <span>CHIEF BABATUNDE OLA</span>
+            <span class="badge-mycay badge-approved">NIMC Verified</span>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Segmented Investor Tabs Navigation -->
+      <div class="space-y-6">
+        <div class="inline-flex h-11 items-center justify-center rounded-xl bg-slate-200/80 p-1 text-slate-600 w-full sm:w-auto overflow-x-auto">
+          <button class="investor-tab-btn nav-link-btn active" data-tab="investments">
+            <i data-lucide="briefcase" class="w-4 h-4"></i>
+            <span>My Holdings</span>
+          </button>
+          <button class="investor-tab-btn nav-link-btn" data-tab="payouts">
+            <i data-lucide="dollar-sign" class="w-4 h-4"></i>
+            <span>Payout History</span>
+          </button>
+          <button class="investor-tab-btn nav-link-btn" data-tab="withdrawals">
+            <i data-lucide="clock" class="w-4 h-4"></i>
+            <span>Withdrawal Requests</span>
+          </button>
+          <button class="investor-tab-btn nav-link-btn" data-tab="documents">
+            <i data-lucide="folder-check" class="w-4 h-4"></i>
+            <span>Document Vault</span>
+          </button>
+        </div>
+
+        <!-- TAB CONTENT 1: MY HOLDINGS -->
+        <div id="tab-content-investments" class="investor-tab-content space-y-4">
+          <div class="flex items-center justify-between">
+            <h3 class="font-heading text-lg font-extrabold text-slate-900">Active Investment Holdings</h3>
+            <button class="btn-mycay btn-mycay-primary text-xs" onclick="window.app.openNewInvestmentModal()">
+              <i data-lucide="plus" class="w-4 h-4"></i>
+              <span>Add New Investment</span>
+            </button>
+          </div>
+
+          <div id="container-my-investments" class="space-y-4"></div>
+        </div>
+
+        <!-- TAB CONTENT 2: PAYOUT HISTORY -->
+        <div id="tab-content-payouts" class="investor-tab-content hidden">
+          <div class="bg-white rounded-2xl shadow-xl border border-slate-200 overflow-hidden">
+            <div class="overflow-x-auto">
+              <table class="w-full text-left text-xs text-slate-800">
+                <thead class="bg-slate-100 border-b border-slate-200 font-mono text-slate-600 uppercase">
+                  <tr>
+                    <th class="p-4">Payout ID</th>
+                    <th class="p-4">Date</th>
+                    <th class="p-4">Investment Plan</th>
+                    <th class="p-4">Amount</th>
+                    <th class="p-4">Status</th>
+                    <th class="p-4 text-right">Receipt</th>
+                  </tr>
+                </thead>
+                <tbody id="table-payout-body" class="divide-y divide-slate-100"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- TAB CONTENT 3: WITHDRAWAL REQUESTS -->
+        <div id="tab-content-withdrawals" class="investor-tab-content space-y-4 hidden">
+          <div class="flex items-center justify-between">
+            <h3 class="font-heading text-lg font-extrabold text-slate-900">30-Day Notice Withdrawal Requests</h3>
+            <button id="btn-open-withdrawal-modal" class="btn-mycay btn-mycay-outline text-xs">
+              <i data-lucide="clock" class="w-4 h-4"></i>
+              <span>Submit 30-Day Notice Withdrawal</span>
+            </button>
+          </div>
+
+          <div id="container-withdrawals-list" class="space-y-3"></div>
+        </div>
+
+        <!-- TAB CONTENT 4: DOCUMENT VAULT -->
+        <div id="tab-content-documents" class="investor-tab-content hidden">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="bg-white p-6 rounded-2xl shadow-xl border border-slate-200 space-y-4">
+              <h4 class="font-heading text-base font-bold text-slate-900 flex items-center gap-2">
+                <i data-lucide="file-check" class="w-5 h-5 text-[#C59B27]"></i>
+                <span>Digital Investment Contracts</span>
+              </h4>
+              <p class="text-xs text-slate-500">Auto-generated PDF agreements governed by platform SLA.</p>
+              <div id="container-document-agreements" class="space-y-2 pt-2"></div>
+            </div>
+
+            <div class="bg-white p-6 rounded-2xl shadow-xl border border-slate-200 space-y-4">
+              <h4 class="font-heading text-base font-bold text-slate-900 flex items-center gap-2">
+                <i data-lucide="file-text" class="w-5 h-5 text-[#C59B27]"></i>
+                <span>Monthly Account Statements</span>
+              </h4>
+              <p class="text-xs text-slate-500">Generated on the 1st of every month automatically.</p>
+              
+              <button class="btn-mycay btn-mycay-primary text-xs w-full" onclick="window.app.openStatementModal()">
+                <i data-lucide="file-spreadsheet" class="w-4 h-4"></i>
+                <span>Generate & Download Statement (PDF)</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ==========================================
+         VIEW 4: STAFF OPERATIONS CRM
+         ========================================== -->
+    <div id="staff-kanban" class="view-container hidden space-y-6">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <h2 class="font-heading text-2xl font-extrabold text-slate-900">Staff Operations Pipeline</h2>
+          <p class="text-xs text-slate-500">Review pending investor applications, approve KYC, and execute walk-in onboarding.</p>
+        </div>
+        <button id="btn-walkin-onboard" class="btn-mycay btn-mycay-primary text-xs shrink-0">
+          <i data-lucide="zap" class="w-4 h-4"></i>
+          <span>Express Walk-In Onboarding (&lt; 15 mins)</span>
+        </button>
+      </div>
+
+      <div class="bg-white rounded-xl p-3 shadow-md border border-slate-200">
+        <input id="input-staff-search" type="text" class="w-full h-10 rounded-lg border border-slate-300 px-3 text-xs font-semibold focus:border-[#C59B27] focus:outline-none" placeholder="Search pipeline by investor name, email, or plan ID...">
+      </div>
+
+      <!-- Kanban Pipeline Columns -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <!-- Column 1: Pending -->
+        <div class="bg-slate-100 rounded-2xl p-4 space-y-3 min-h-[420px] border border-slate-200">
+          <div class="flex items-center justify-between pb-2 border-b border-slate-200">
+            <span class="font-mono text-xs font-bold uppercase text-slate-800 flex items-center gap-1.5">
+              <i data-lucide="clock" class="w-4 h-4 text-[#D97706]"></i>
+              Pending Approval
+            </span>
+            <span class="badge-mycay badge-pending">1</span>
+          </div>
+          <div id="kanban-col-pending" class="space-y-3"></div>
+        </div>
+
+        <!-- Column 2: Active -->
+        <div class="bg-slate-100 rounded-2xl p-4 space-y-3 min-h-[420px] border border-slate-200">
+          <div class="flex items-center justify-between pb-2 border-b border-slate-200">
+            <span class="font-mono text-xs font-bold uppercase text-slate-800 flex items-center gap-1.5">
+              <i data-lucide="check-circle-2" class="w-4 h-4 text-[#16A34A]"></i>
+              Active Investors
+            </span>
+            <span class="badge-mycay badge-approved">2</span>
+          </div>
+          <div id="kanban-col-active" class="space-y-3"></div>
+        </div>
+
+        <!-- Column 3: Withdrawn -->
+        <div class="bg-slate-100 rounded-2xl p-4 space-y-3 min-h-[420px] border border-slate-200">
+          <div class="flex items-center justify-between pb-2 border-b border-slate-200">
+            <span class="font-mono text-xs font-bold uppercase text-slate-600 flex items-center gap-1.5">
+              <i data-lucide="archive" class="w-4 h-4"></i>
+              Withdrawn Portfolios
+            </span>
+            <span class="badge-mycay badge-gold">1</span>
+          </div>
+          <div id="kanban-col-withdrawn" class="space-y-3"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ==========================================
+         VIEW 5: FINANCE DESK & LEDGER
+         ========================================== -->
+    <div id="finance-ledger" class="view-container hidden space-y-6">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <h2 class="font-heading text-2xl font-extrabold text-slate-900">Finance Desk & Ledger</h2>
+          <p class="text-xs text-slate-500">Monitor Capital Under Management (CUM) and execute monthly batch payouts.</p>
+        </div>
+        <button id="btn-process-batch-payouts" class="btn-mycay btn-mycay-primary text-xs shrink-0">
+          <i data-lucide="layers" class="w-4 h-4"></i>
+          <span>Execute Monthly Batch Payouts</span>
+        </button>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+        <div class="bg-white rounded-2xl p-6 shadow-xl border border-slate-200 space-y-2">
+          <span class="text-xs font-mono font-bold text-slate-500 uppercase">Capital Under Management (CUM)</span>
+          <div id="finance-cum-total" class="font-mono text-4xl font-black text-slate-900">₦100,000,000</div>
+        </div>
+
+        <div class="bg-white rounded-2xl p-6 shadow-xl border border-slate-200 space-y-2">
+          <span class="text-xs font-mono font-bold text-slate-500 uppercase">Daily NGN/USD FX Exchange Rate</span>
+          <div class="flex items-center gap-3 pt-1">
+            <input id="input-exchange-rate" type="number" class="w-36 h-10 rounded-lg border border-slate-300 px-3 font-mono font-bold text-sm focus:border-[#C59B27] focus:outline-none" value="1550">
+            <button id="btn-update-exchange-rate" class="btn-mycay btn-mycay-dark text-xs h-10">Update Rate</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-white p-6 rounded-2xl shadow-xl border border-slate-200 space-y-4">
+        <div class="flex items-center justify-between">
+          <h3 class="font-heading text-lg font-extrabold text-slate-900">Active Investment Ledger</h3>
+          <div class="flex items-center gap-2">
+            <button id="btn-export-ledger-csv" class="btn-mycay btn-mycay-outline text-xs h-9">Export CSV</button>
+            <button id="btn-export-cum-pdf" class="btn-mycay btn-mycay-outline text-xs h-9">Download CUM PDF</button>
+          </div>
+        </div>
+
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-xs text-slate-800">
+            <thead class="bg-slate-100 border-b border-slate-200 font-mono text-slate-600 uppercase">
+              <tr>
+                <th class="p-3">Ledger ID</th>
+                <th class="p-3">Investor Name</th>
+                <th class="p-3">Plan</th>
+                <th class="p-3">Capital Invested</th>
+                <th class="p-3">Next Payout</th>
+                <th class="p-3">Monthly Amount</th>
+                <th class="p-3">Status</th>
+                <th class="p-3 text-right">Action</th>
+              </tr>
+            </thead>
+            <tbody id="table-finance-ledger-body" class="divide-y divide-slate-100"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- ==========================================
+       MODALS & DIALOGS
+       ========================================== -->
+
+  <!-- MODAL 1: ADD NEW INVESTMENT -->
+  <div id="new-investment-modal" class="modal-overlay hidden">
+    <div class="modal-box space-y-4">
+      <div class="flex items-center justify-between border-b border-slate-200 pb-3">
+        <h3 id="modal-new-inv-title" class="font-heading text-lg font-extrabold text-slate-900">Subscribe to Investment Plan</h3>
+        <button class="text-slate-400 hover:text-slate-700 cursor-pointer" onclick="document.getElementById('new-investment-modal').classList.add('hidden')">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <form id="form-new-investment" onsubmit="event.preventDefault(); window.app.submitNewInvestment();" class="space-y-4">
+        <div class="space-y-1">
+          <label class="block text-xs font-mono uppercase font-bold text-slate-700">1. Select Product Offering</label>
+          <select id="select-new-plan-type" class="w-full h-11 rounded-lg border border-slate-300 px-3 text-xs font-semibold focus:border-[#C59B27] focus:outline-none" onchange="window.app.toggleNewPlanOptions()">
+            <option value="GIAP">GIAP — Guaranteed Asset Plan (70/30 Property Profit Split)</option>
+            <option value="WealthStream">WealthStream — High-Yield Income (24% p.a. Monthly Payout)</option>
+          </select>
+        </div>
+
+        <div class="space-y-1">
+          <label class="block text-xs font-mono uppercase font-bold text-slate-700">2. Investment Capital Amount (NGN)</label>
+          <select id="select-new-capital-amount" class="w-full h-11 rounded-lg border border-slate-300 px-3 text-xs font-semibold focus:border-[#C59B27] focus:outline-none" onchange="window.app.updateInvestmentCalculations()">
+            <option value="5000000">₦5,000,000 (5 Million NGN)</option>
+            <option value="10000000" selected>₦10,000,000 (10 Million NGN)</option>
+            <option value="25000000">₦25,000,000 (25 Million NGN)</option>
+            <option value="50000000">₦50,000,000 (50 Million NGN)</option>
+          </select>
+        </div>
+
+        <div id="group-giap-options" class="space-y-1">
+          <label class="block text-xs font-mono uppercase font-bold text-slate-700">3. Select Linked Property Asset</label>
+          <select id="select-giap-asset" class="w-full h-11 rounded-lg border border-slate-300 px-3 text-xs font-semibold focus:border-[#C59B27] focus:outline-none">
+            <option value="Lekki Phase 1 Luxury Residences">Lekki Phase 1 Luxury Residences (Residential)</option>
+            <option value="Victoria Island Commercial Plaza">Victoria Island Commercial Plaza (Commercial)</option>
+            <option value="Ikeja Tech Hub & Executive Suites">Ikeja Tech Hub & Executive Suites (Mixed Use)</option>
+          </select>
+        </div>
+
+        <div class="p-4 rounded-xl bg-slate-50 border border-slate-200 text-xs text-slate-700 space-y-1">
+          <div class="flex justify-between font-mono font-bold">
+            <span>Estimated Annual Return:</span>
+            <span id="label-calc-roi" class="text-[#C59B27]">₦2,400,000 / year (24%)</span>
+          </div>
+          <div class="flex justify-between font-mono text-[11px] text-slate-500">
+            <span>Payment Schedule:</span>
+            <span id="label-calc-schedule">Monthly (1st of month)</span>
+          </div>
+        </div>
+
+        <div class="flex items-center justify-end gap-3 pt-2">
+          <button type="button" class="btn-mycay btn-mycay-outline text-xs" onclick="document.getElementById('new-investment-modal').classList.add('hidden')">Cancel</button>
+          <button type="submit" class="btn-mycay btn-mycay-primary text-xs">Confirm Investment</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL 2: PRINTABLE MONTHLY STATEMENT PREVIEW -->
+  <div id="statement-modal" class="modal-overlay hidden">
+    <div class="modal-box max-w-2xl bg-white space-y-6">
+      <div class="flex items-center justify-between border-b border-slate-200 pb-4">
+        <div class="flex items-center gap-3">
+          <div class="w-8 h-8 rounded bg-[#C59B27] flex items-center justify-center">
+            <svg class="w-5 h-5 fill-white" viewBox="0 0 24 24">
+              <path d="M4 18L10 6H13.5L7.5 18H4Z"/>
+              <path d="M11 18L17 6H20.5L14.5 18H11Z"/>
+            </svg>
+          </div>
+          <div>
+            <h3 class="font-heading font-extrabold text-lg text-slate-900">Monthly Investment Statement</h3>
+            <span class="text-xs font-mono text-slate-500">Statement ID: JOI-WS-2026-09-0392</span>
+          </div>
+        </div>
+        <button class="text-slate-400 hover:text-slate-700 cursor-pointer" onclick="document.getElementById('statement-modal').classList.add('hidden')">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <!-- Printable Statement Body -->
+      <div class="p-6 rounded-2xl bg-slate-50 border border-slate-200 space-y-6 text-xs text-slate-800">
+        <div class="flex justify-between pb-4 border-b border-slate-200">
+          <div>
+            <span class="font-mono text-[10px] uppercase text-slate-400 block">Investor Details</span>
+            <span class="font-bold text-slate-900 block text-sm">Chief Babatunde Ola</span>
+            <span class="font-mono text-slate-500">Investor ID: INV-2026-0847</span>
+          </div>
+          <div class="text-right">
+            <span class="font-mono text-[10px] uppercase text-slate-400 block">Statement Period</span>
+            <span class="font-bold text-slate-900 block">September 1 — Sept 30, 2026</span>
+            <span class="badge-mycay badge-approved mt-1">Verified</span>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-4 bg-white p-4 rounded-xl border border-slate-200">
+          <div>
+            <span class="text-slate-500 block">Plan Holding</span>
+            <span class="font-bold text-slate-900 block">WealthStream Fixed Income</span>
+          </div>
+          <div>
+            <span class="text-slate-500 block">Capital Invested</span>
+            <span class="font-mono font-bold text-slate-900 block">₦10,000,000</span>
+          </div>
+          <div>
+            <span class="text-slate-500 block">Annual ROI</span>
+            <span class="font-bold text-[#C59B27] block">24% p.a.</span>
+          </div>
+          <div>
+            <span class="text-slate-500 block">September Monthly Payout</span>
+            <span class="font-mono font-bold text-[#16A34A] block">₦200,000 ✓ (Paid Sept 1)</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="flex justify-end gap-3">
+        <button class="btn-mycay btn-mycay-outline text-xs" onclick="document.getElementById('statement-modal').classList.add('hidden')">Close</button>
+        <button class="btn-mycay btn-mycay-primary text-xs" onclick="window.app.showToast('Printing Statement (PDF)...'); document.getElementById('statement-modal').classList.add('hidden');">
+          <i data-lucide="printer" class="w-4 h-4"></i>
+          <span>Print / Save PDF</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification Area -->
+  <div id="toast-container"></div>
+
+  <!-- Application Logic Modules -->
+  <script src="js/app.js"></script>
+  <script src="js/onboarding.js"></script>
+  <script src="js/investor-dashboard.js"></script>
+  <script src="js/staff-dashboard.js"></script>
+  <script src="js/finance-dashboard.js"></script>
+</body>
+</html>
