@@ -76,3 +76,11 @@ The current persistence is a local JSON file for one server process. Production 
 Finance records references for transfers performed outside the app; the app does not initiate real Paystack transfers. Email templates and the outbox remain local records; email/SMS/push delivery, recurring statements/expiry reminders, mandatory admin TOTP, and full website CMS editing remain integration work. Paystack initialization, verification, and webhook handling need staging validation with account credentials. No live transactions were used during verification.
 
 For the registration/KYC integration check, start an isolated test server with `DATABASE_PATH=/tmp/mycay-flow-test.json`, `ADMIN_EMAIL=flow-admin@example.test`, and a test-only `ADMIN_PASSWORD`. Run `TEST_URL=http://127.0.0.1:3110 TEST_ADMIN_PASSWORD=your-test-password npm run test:kyc`. The check creates synthetic accounts and requires a disposable database.
+
+## Netlify deployment
+
+Connect this repository and deploy the `main` branch. The root `netlify.toml` sets the base directory to the repository root, build command to `npm run build`, and publish directory to `.next`. Netlify detects Next.js and supplies its runtime adapter. Do not deploy the `public` directory or add an SPA redirect to `index.html`.
+
+Set `SESSION_SECRET` and `NEXT_PUBLIC_APP_URL` in Netlify's environment variables before deploying authentication. `NEXT_PUBLIC_APP_URL` should be the full HTTPS site URL. Preview is disabled in production unless `ENABLE_PREVIEW=true` is explicitly set.
+
+The public site can be deployed with this configuration. The current account/KYC store uses local JSON files and must move to persistent server-side storage before accounts and uploads can run reliably on Netlify Functions. Deploying the build does not provide a persistent database.
