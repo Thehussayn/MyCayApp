@@ -139,7 +139,7 @@ export default function RegisterPage() {
 
   return (
     <AuthShell
-      kicker="Investor Onboarding"
+      kicker="MyCayApp"
       title="Create Investor Account"
       subtitle="Create your account, then complete your KYC in the portal."
     >

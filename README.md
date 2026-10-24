@@ -8,6 +8,8 @@ Next.js 14 application with a public investment website, investor portal, and on
 npm install
 cp .env.example .env.local
 npm run dev
+# Or keep the review preview on its dedicated port/cache:
+npm run dev:preview
 ```
 
 Set `SESSION_SECRET`. To seed a **new** database, also set `ADMIN_EMAIL` and a strong `ADMIN_PASSWORD` before the first request. The local account database is excluded from Git. Set `DATABASE_PATH` to use a separate database for testing.
@@ -39,7 +41,7 @@ The `/admin` app and API enforce these permissions on the server. Super Admin ca
 
 ## Registration and KYC
 
-Registration signs investors in immediately. Investors complete the seven-step KYC inside the portal. Staff review submitted details and documents from the Investors table and individual investor record. There is no registration approval queue or separate Onboarding module. KYC approval is required to invest; requests for changes do not block access to the portal.
+Registration signs investors in immediately. Investors complete the seven-step KYC inside the portal. Staff review submitted details and documents from the responsive Investors table and individual investor record at `/admin/investors/[id]`. The detail URL survives refresh and supports direct links. There is no registration approval queue or separate Onboarding module. KYC approval is required to invest; requests for changes do not block access to the portal.
 
 ## Investment flows
 

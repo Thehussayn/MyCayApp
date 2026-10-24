@@ -35,7 +35,7 @@ const sections = [
   { id: "audit", name: "Audit log", icon: History },
   { id: "settings", name: "Settings", icon: Settings },
 ];
-export default function AdminApp({ section }: { section: string }) {
+export default function AdminApp({ section, investorId }: { section: string; investorId?: string }) {
   const router = useRouter();
   const [overview, setOverview] = useState<any>(null),
     [data, setData] = useState<any>(null),
@@ -232,6 +232,7 @@ export default function AdminApp({ section }: { section: string }) {
                   {section === "investors" && (
                     <Investors
                       data={data}
+                      investorId={investorId}
                       canReview={overview.permissions.includes("review")}
                       busy={busy}
                       act={act}

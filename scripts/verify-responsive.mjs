@@ -67,6 +67,15 @@ try {
       "/forgot-password",
       "/reset-password",
       "/portal/status",
+      "/portal/dashboard",
+      "/portal/investments",
+      "/portal/investments/new",
+      "/portal/biodata",
+      "/portal/documents",
+      "/portal/transactions",
+      "/portal/notifications",
+      "/portal/profile",
+      "/portal/settings",
       detail,
     ]) {
       await page.goto(base + route);
@@ -88,7 +97,11 @@ try {
     await page.setViewportSize({ width, height: 900 });
     assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1), `Investor table overflows viewport at ${width}px`);
   }
-  await page.getByRole("button", { name: /View Alex Morgan/ }).click();
+  assert.equal(await page.getByRole("link", { name: "Onboarding", exact: true }).count(), 0);
+  await page.locator('a[aria-label="View Alex Morgan"]:visible').click();
+  await page.waitForURL(/\/admin\/investors\/preview_INVESTOR/);
+  await page.reload();
+  await page.getByRole("heading", { name: "Alex Morgan", exact: true }).waitFor();
   await page
     .getByRole("button", {
       name: "Complete profile on behalf of investor",
@@ -104,9 +117,18 @@ try {
       `Staff-assisted form overflows at ${width}px`,
     );
   }
+  for (const width of [360, 1280]) {
+    await page.setViewportSize({ width, height: 900 });
+    for (const route of ["/admin", "/admin/investors", "/admin/finance", "/admin/content", "/admin/users", "/admin/audit", "/admin/settings"]) {
+      await page.goto(base + route);
+      await page.waitForTimeout(250);
+      assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1), `${route} overflows at ${width}px`);
+      assert.equal(await page.getByText("Application error:", { exact: false }).count(), 0);
+    }
+  }
   assert.deepEqual(errors, []);
   console.log(
-    "PASS: mobile preview entry, onboarding step skipping, keyboard drawer dismissal, full WealthStream creation, withdrawal submission, staff-assisted form, and additional responsive routes.",
+    "PASS: all investor portal pages and admin modules at mobile/desktop widths, KYC step skipping, navigation dismissal, WealthStream creation, withdrawal submission, investor detail URLs and refresh, and staff-assisted forms.",
   );
 } finally {
   await browser.close();

@@ -61,7 +61,7 @@ export default function PreviewBar() {
             )}
           </select>
           {role === "INVESTOR" && (
-            <Link href="/portal/biodata">Onboarding</Link>
+            <Link href="/portal/biodata">Complete KYC</Link>
           )}
           <button
             onClick={async () => {

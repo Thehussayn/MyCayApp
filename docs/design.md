@@ -14,3 +14,5 @@ Registration provides immediate portal access. Investors complete the seven-step
 The investor prototype includes registration, the seven KYC steps, submission and change-request states, overview, GIAP and WealthStream creation and payment, investment details, top-ups, withdrawal review/notice states, transactions, documents, notifications, profile, and settings. Prototype links support click-through review; file uploads, downloads, and form fields are design representations.
 
 Desktop frames are 1440px wide; mobile frames are 390px wide. App browser checks additionally cover 360px, 768px and 1280px widths.
+
+The implementation uses `/admin/investors/[id]` for independent investor records. Read-only KYC details are grouped by the same seven steps as the investor form; overall review follows the submitted details and documents. The local preview uses a separate `.next-preview` cache so production builds do not replace its running assets.

@@ -10,7 +10,8 @@
     "typecheck": "tsc --noEmit",
     "test:integration": "node scripts/verify-platform.mjs",
     "test:responsive": "node scripts/verify-responsive.mjs",
-    "test:kyc": "node scripts/verify-kyc-flow.mjs"
+    "test:kyc": "node scripts/verify-kyc-flow.mjs",
+    "dev:preview": "NEXT_DIST_DIR=.next-preview next dev --hostname 127.0.0.1 --port 3102"
   },
   "dependencies": {
     "clsx": "^2.1.1",

@@ -1,5 +1,6 @@
 "use client";
 import { useState } from "react";
+import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import { Metric, Status, label } from "@/components/portal/Investments";
 import { formatCurrency as money } from "@/lib/utils";
@@ -8,15 +9,16 @@ import { exportCsv } from "./csv";
 import type { ActionProps } from "./types";
 import DirectProfile from "./DirectProfile";
 import Audit from "./Audit";
+import { biodataSteps } from "@/lib/kyc/fields";
 export default function Investors({
   data,
+  investorId,
   canReview,
   busy,
   act,
-}: { data: any; canReview: boolean } & ActionProps) {
+}: { data: any; investorId?: string; canReview: boolean } & ActionProps) {
   const [query, setQuery] = useState(""),
     [status, setStatus] = useState("ALL"),
-    [selectedId, setSelectedId] = useState(""),
     [reason, setReason] = useState(""),
     [create, setCreate] = useState(false),
     [edit, setEdit] = useState<any>(null),
@@ -27,7 +29,7 @@ export default function Investors({
       country: "Nigeria",
       password: "",
     });
-  const selected = data.investors.find((u: any) => u.id === selectedId);
+  const selected = data.investors.find((u: any) => u.id === investorId);
   const investors = data.investors.filter(
     (u: any) =>
       (status === "ALL" || (u.kycStatus || "NOT_STARTED") === status) &&
@@ -35,19 +37,19 @@ export default function Investors({
         .toLowerCase()
         .includes(query.toLowerCase()),
   );
+  if (investorId && !selected) return (
+    <div className="panel space-y-4">
+      <p>Investor not found.</p>
+      <Link className="action secondary" href="/admin/investors">Back to investors</Link>
+    </div>
+  );
   if (selected)
     return (
       <div className="space-y-5">
-        <button
-          className="inline-flex gap-2 text-sm items-center"
-          onClick={() => {
-            setSelectedId("");
-            setEdit(null);
-          }}
-        >
+        <Link href="/admin/investors" className="inline-flex gap-2 text-sm items-center">
           <ArrowLeft size={16} />
           Investors
-        </button>
+        </Link>
         <div className="panel space-y-5">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div>
@@ -63,41 +65,7 @@ export default function Investors({
             <Metric title="Country" value={selected.country} />
             <Metric title="Verification" value={label(selected.kycStatus)} />
           </div>
-          {canReview && selected.biodata?.isSubmitted && selected.kycStatus !== "APPROVED" && (
-            <>
-              <label className="field">
-                Review note
-                <textarea
-                  value={reason}
-                  onChange={(e) => setReason(e.target.value)}
-                  placeholder="Reason for a decline or request for information"
-                />
-              </label>
-              <div className="flex flex-wrap gap-3">
-                {[
-                  ["APPROVED", "Approve KYC"],
-                  ["INFO_REQUESTED", "Request information"],
-                  ["DECLINED", "Reject KYC"],
-                ].map(([s, t]) => (
-                  <button
-                    key={s}
-                    className={`action ${s === "APPROVED" ? "" : "secondary"}`}
-                    disabled={busy}
-                    onClick={() =>
-                      act({
-                        action: "REVIEW",
-                        userId: selected.id,
-                        status: s,
-                        reason,
-                      })
-                    }
-                  >
-                    {t}
-                  </button>
-                ))}
-              </div>
-            </>
-          )}
+
         </div>
         <section className="panel space-y-5">
           <div className="flex justify-between gap-3">
@@ -158,30 +126,28 @@ export default function Investors({
                   </button>
                 </>
               ) : (
-                <dl className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
-                  {Object.entries(selected.biodata)
-                    .filter(
-                      ([k]) =>
-                        ![
-                          "id",
-                          "userId",
-                          "completedSteps",
-                          "currentStep",
-                          "createdAt",
-                          "updatedAt",
-                        ].includes(k),
-                    )
-                    .map(([k, v]) => (
-                      <div key={k}>
-                        <dt className="text-xs text-neutral-500 capitalize">
-                          {k.replace(/([A-Z])/g, " $1")}
-                        </dt>
-                        <dd className="text-sm mt-1 break-words">
-                          {Array.isArray(v) ? v.join(", ") : String(v ?? "—")}
-                        </dd>
-                      </div>
-                    ))}
-                </dl>
+                <div className="space-y-6">
+                  {biodataSteps.slice(0, 6).map((step) => (
+                    <section key={step.title} className="border-t pt-5">
+                      <h3 className="font-semibold mb-4">{step.title}</h3>
+                      <dl className="grid sm:grid-cols-2 gap-5">
+                        {step.fields.map((field) => (
+                          <div key={field.key}>
+                            <dt className="text-xs text-neutral-500">{field.label}</dt>
+                            <dd className="text-sm mt-1 break-words">{field.key === "bankCode" ? selected.biodata.bankName || "—" : selected.biodata[field.key] || "—"}</dd>
+                          </div>
+                        ))}
+                      </dl>
+                    </section>
+                  ))}
+                  {selected.biodata.isSubmitted && (
+                    <section className="border-t pt-5 space-y-2">
+                      <h3 className="font-semibold">Declaration & signature</h3>
+                      <p className="text-sm">{selected.biodata.digitalSignature}</p>
+                      <p className="text-xs text-neutral-500">Submitted {new Date(selected.biodata.submittedAt).toLocaleDateString("en-GB")}</p>
+                    </section>
+                  )}
+                </div>
               )}
             </>
           ) : (
@@ -246,10 +212,45 @@ export default function Investors({
             <p className="text-sm text-neutral-500">No documents uploaded.</p>
           )}
           <p className="text-xs text-neutral-500">
-            Use the review note above when requesting a replacement or rejecting
-            a document.
+            Use the KYC decision note below when requesting a replacement or rejecting a document.
           </p>
         </section>
+          {canReview && selected.biodata?.isSubmitted && selected.kycStatus !== "APPROVED" && (
+            <section className="panel space-y-5">
+              <h2 className="font-semibold">KYC decision</h2>
+              <label className="field">
+                Review note
+                <textarea
+                  value={reason}
+                  onChange={(e) => setReason(e.target.value)}
+                  placeholder="Reason for a decline or request for information"
+                />
+              </label>
+              <div className="flex flex-wrap gap-3">
+                {[
+                  ["APPROVED", "Approve KYC"],
+                  ["INFO_REQUESTED", "Request information"],
+                  ["DECLINED", "Reject KYC"],
+                ].map(([s, t]) => (
+                  <button
+                    key={s}
+                    className={`action ${s === "APPROVED" ? "" : "secondary"}`}
+                    disabled={busy || (s === "APPROVED" && !["GOVERNMENT_ID", "PROOF_OF_ADDRESS", "SPECIMEN_SIGNATURE"].every((type) => selected.documents.some((d: any) => d.documentType === type && d.status === "APPROVED")))}
+                    onClick={() =>
+                      act({
+                        action: "REVIEW",
+                        userId: selected.id,
+                        status: s,
+                        reason,
+                      })
+                    }
+                  >
+                    {t}
+                  </button>
+                ))}
+              </div>
+            </section>
+          )}
         <section className="panel space-y-4">
           <h2 className="font-semibold">Investments</h2>
           {selected.investments.map((i: any) => (
@@ -414,19 +415,34 @@ export default function Investors({
       )}
       <div className="panel !p-0 overflow-hidden">
         <div className="overflow-x-auto" role="region" aria-label="Investor directory" tabIndex={0}>
-          <table className="w-full min-w-[760px] text-sm text-left">
+          <table className="w-full table-fixed text-sm text-left lg:table-auto">
             <caption className="sr-only">Investors and submitted KYC status</caption>
             <thead className="bg-neutral-50 text-xs text-neutral-500">
-              <tr>{["Investor", "Email", "Country", "KYC status", "Registered", ""].map((heading) => <th key={heading} scope="col" className="p-4 font-medium">{heading}</th>)}</tr>
+              <tr>
+                <th scope="col" className="p-4 font-medium w-[42%] lg:w-auto">Investor</th>
+                <th scope="col" className="p-4 font-medium hidden lg:table-cell">Email</th>
+                <th scope="col" className="p-4 font-medium hidden xl:table-cell">Country</th>
+                <th scope="col" className="p-4 font-medium">KYC status</th>
+                <th scope="col" className="p-4 font-medium hidden xl:table-cell">Registered</th>
+                <th scope="col" className="p-4 font-medium hidden lg:table-cell"><span className="sr-only">Actions</span></th>
+              </tr>
             </thead>
             <tbody className="divide-y">
               {investors.map((u: any) => (
-                <tr key={u.id} className="hover:bg-neutral-50">
-                  <th scope="row" className="p-4 font-medium"><button className="text-left underline underline-offset-4" onClick={() => { setSelectedId(u.id); setReason(""); }}>{u.fullName}</button><p className="text-xs text-neutral-500 font-normal mt-1">{u.referenceId}</p></th>
-                  <td className="p-4">{u.email}</td><td className="p-4">{u.country}</td>
-                  <td className="p-4"><Status value={u.kycStatus || "NOT_STARTED"} /></td>
-                  <td className="p-4 whitespace-nowrap">{new Date(u.createdAt).toLocaleDateString("en-GB")}</td>
-                  <td className="p-4"><button className="action secondary whitespace-nowrap" aria-label={`View ${u.fullName}`} onClick={() => { setSelectedId(u.id); setReason(""); }}>View investor</button></td>
+                <tr key={u.id} className="hover:bg-neutral-50 align-top">
+                  <th scope="row" className="p-4 font-medium break-words">
+                    <Link href={`/admin/investors/${encodeURIComponent(u.id)}`} className="hover:underline underline-offset-4">{u.fullName}</Link>
+                    <p className="text-xs text-neutral-500 font-normal mt-1 hidden lg:block">{u.referenceId}</p>
+                    <p className="text-xs text-neutral-500 font-normal mt-1 lg:hidden">{new Date(u.createdAt).toLocaleDateString("en-GB")}</p>
+                  </th>
+                  <td className="p-4 hidden lg:table-cell break-all">{u.email}</td>
+                  <td className="p-4 hidden xl:table-cell">{u.country}</td>
+                  <td className="p-4">
+                    <Status value={u.kycStatus || "NOT_STARTED"} />
+                    <Link className="action secondary !px-2 mt-3 w-full text-center lg:hidden" href={`/admin/investors/${encodeURIComponent(u.id)}`} aria-label={`View ${u.fullName}`}>View investor</Link>
+                  </td>
+                  <td className="p-4 whitespace-nowrap hidden xl:table-cell">{new Date(u.createdAt).toLocaleDateString("en-GB")}</td>
+                  <td className="p-4 hidden lg:table-cell"><Link className="action secondary whitespace-nowrap" href={`/admin/investors/${encodeURIComponent(u.id)}`} aria-label={`View ${u.fullName}`}>View investor</Link></td>
                 </tr>
               ))}
             </tbody>

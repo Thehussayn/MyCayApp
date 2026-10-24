@@ -14,6 +14,7 @@ export default function Profile() {
         .then((d) => setBio(d.biodata))
         .catch((e) => setError(e.message));
   }, [user]);
+  const needsUpdate = ["INFO_REQUESTED", "REJECTED"].includes(user?.kycStatus || "");
   return (
     <PortalShell user={user} currentTitle="Profile">
       <div className="max-w-4xl mx-auto space-y-6">
@@ -27,9 +28,9 @@ export default function Profile() {
           </div>
           <Link
             className="action secondary"
-            href={bio?.isSubmitted ? "/portal/documents" : "/portal/biodata"}
+            href={bio?.isSubmitted && !needsUpdate ? "/portal/documents" : "/portal/biodata"}
           >
-            {bio?.isSubmitted ? "Manage documents" : "Complete profile"}
+            {needsUpdate ? "Update KYC" : bio?.isSubmitted ? "Manage documents" : "Complete KYC"}
           </Link>
         </div>
         {bio &&
