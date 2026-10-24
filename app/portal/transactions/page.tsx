@@ -10,6 +10,7 @@ export default function Transactions() {
   const [transactions, setTransactions] = useState<any[]>([]),
     [search, setSearch] = useState(""),
     [filter, setFilter] = useState("ALL"),
+    [status, setStatus] = useState("ALL"),
     [error, setError] = useState(""),
     [loading, setLoading] = useState(true);
   useEffect(() => {
@@ -21,14 +22,14 @@ export default function Transactions() {
   }, [user]);
   const filtered = transactions.filter(
     (t) =>
-      (filter === "ALL" || t.direction === filter) &&
+      (filter === "ALL" || t.direction === filter) && (status === "ALL" || t.status === status) &&
       `${t.reference} ${t.title}`.toLowerCase().includes(search.toLowerCase()),
   );
   return (
-    <PortalShell user={user} currentTitle="Transactions">
+    <PortalShell user={user} currentTitle="Transactions & Receipts">
       <div className="max-w-6xl mx-auto space-y-6">
         {error && <p className="error">{error}</p>}
-        <div className="flex flex-col sm:flex-row gap-3">
+        <div className="investor-filter-bar flex flex-col sm:flex-row gap-3">
           <label className="field flex-1">
             <span className="sr-only">Search transactions</span>
             <input
@@ -45,6 +46,7 @@ export default function Transactions() {
               <option value="CREDIT">Payouts</option>
             </select>
           </label>
+          <label className="field"><span className="sr-only">Transaction status</span><select value={status} onChange={e => setStatus(e.target.value)}><option value="ALL">All statuses</option>{Array.from(new Set(transactions.map(t => t.status))).map(s => <option key={s}>{s}</option>)}</select></label>
         </div>
         <div className="panel">
           {loading ? (
@@ -54,8 +56,7 @@ export default function Transactions() {
               <table>
                 <thead>
                   <tr>
-                    <th>Date</th>
-                    <th>Transaction</th>
+                    <th>Reference</th><th>Transaction details</th><th>Plan / Asset</th><th>Date</th>
                     <th>Amount</th>
                     <th>Status</th>
                     <th>Receipt</th>
@@ -64,14 +65,14 @@ export default function Transactions() {
                 <tbody>
                   {filtered.map((t) => (
                     <tr key={t.id}>
-                      <td className="whitespace-nowrap">{t.date}</td>
+                      <td className="text-xs">{t.reference}</td>
                       <td>
                         {t.title}
                         <p className="text-xs text-neutral-500 mt-1">
                           {t.reference}
                         </p>
                       </td>
-                      <td className="whitespace-nowrap">{money(t.amount)}</td>
+                      <td>{t.plan || "—"}</td><td className="whitespace-nowrap">{t.date}</td><td className={`whitespace-nowrap ${t.direction === "CREDIT" ? "text-emerald-700" : ""}`}>{t.direction === "CREDIT" ? "+" : ""}{money(t.amount)}</td>
                       <td>
                         <Status value={t.status} />
                       </td>

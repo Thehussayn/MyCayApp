@@ -5,10 +5,12 @@ export default function KycUpload({
   type,
   title,
   userId,
+  onChange,
 }: {
   type: string;
   title: string;
   userId?: string;
+  onChange?: () => void;
 }) {
   const [hostedDemo, setHostedDemo] = useState(false);
   useEffect(() => { fetch("/api/auth/me").then((r) => r.json()).then((d) => setHostedDemo(!!d.hostedDemo)).catch(() => {}); }, []);
@@ -49,6 +51,7 @@ export default function KycUpload({
         fileUrl,
       });
       setDoc(d.document);
+      onChange?.();
     } catch (e) {
       setError((e as Error).message);
     } finally {
@@ -100,6 +103,7 @@ export default function KycUpload({
           <span className="text-neutral-500 ml-2 capitalize">
             {doc.status.replaceAll("_", " ").toLowerCase()}
           </span>
+          {!userId && <button type="button" className="block mt-3 text-xs text-rose-700 underline" disabled={busy} onClick={async () => {setBusy(true);setError("");try {const r = await fetch("/api/portal/documents",{method:"DELETE",headers:{"Content-Type":"application/json"},body:JSON.stringify({documentType:type})});const d=await r.json();if(!r.ok)throw Error(d.error);setDoc(null);onChange?.();} catch(e){setError((e as Error).message)}finally{setBusy(false)}}}>Remove document</button>}
           {doc.rejectionReason && (
             <span className="block text-rose-700 mt-2">
               {doc.rejectionReason}

@@ -145,9 +145,9 @@ export default function Investments({ id }: { id?: string }) {
         ) : id ? (
           selected ? (
             <>
-              <div className="panel">
+              <div className="panel investment-summary">
                 <div className="flex flex-wrap items-center justify-between gap-3 mb-6">
-                  <h2 className="font-semibold">Investment summary</h2>
+                  <h2 className="investor-summary-label">Investment summary</h2>
                   <Status value={selected.status} />
                 </div>
                 <div className="grid sm:grid-cols-3 gap-6">
@@ -441,7 +441,7 @@ export default function Investments({ id }: { id?: string }) {
           <>
             <div className="flex flex-wrap gap-4 justify-between">
               <div
-                className="flex flex-wrap gap-2"
+                className="investor-tabs gold flex flex-wrap gap-2"
                 role="group"
                 aria-label="Filter by plan"
               >
@@ -472,6 +472,7 @@ export default function Investments({ id }: { id?: string }) {
                 </select>
               </label>
             </div>
+            <section className="investor-total"><p>Total investment</p><strong>{formatCurrency(all.reduce((sum, i) => sum + i.capital, 0))}</strong></section>
             {filtered.length ? (
               <div className="grid md:grid-cols-2 gap-5">
                 {filtered.map((i) => (

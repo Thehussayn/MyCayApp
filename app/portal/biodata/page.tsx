@@ -2,7 +2,8 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import PortalShell from "@/components/portal/PortalShell";
+import { InvestorLogo, InvestorFooter, FigmaIcon } from "@/components/portal/FigmaAsset";
+import PreviewBar from "@/components/portal/PreviewBar";
 import KycUpload from "@/components/portal/KycUpload";
 import { usePortal, request } from "@/components/portal/usePortal";
 import { biodataSteps } from "@/lib/kyc/fields";
@@ -67,7 +68,7 @@ export default function Biodata() {
       }
       setData(d.biodata);
       setSaved(true);
-      if (final) router.push("/portal/verification");
+      if (final) router.push("/portal/onboarding-complete");
       else if (exit) router.push("/portal/dashboard");
       else {
         setStep(Math.min(7, step + 1));
@@ -81,14 +82,9 @@ export default function Biodata() {
   }
   const definition = biodataSteps[step - 1];
   return (
-    <PortalShell user={user}>
-      <div className="max-w-4xl mx-auto space-y-6">
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <h1 className="workspace-title">Your profile</h1>
-          <Link href="/portal/dashboard" className="text-sm underline">
-            Back to overview
-          </Link>
-        </div>
+    <div className="workspace kyc-workspace"><PreviewBar/>
+      <header className="kyc-header"><div className="kyc-header-inner"><div className="kyc-header-brand"><InvestorLogo /><span>BIODATA</span></div><nav className="kyc-header-actions"><button disabled={busy || !data} onClick={() => save(false, true)}>Save &amp; Exit</button><Link href="/portal/dashboard">Dashboard</Link></nav></div></header>
+      <div className="kyc-main space-y-6">
         {error && (
           <p className="error" role="alert">
             {error}
@@ -96,52 +92,22 @@ export default function Biodata() {
         )}
         {data && (
           <>
-            <div className="flex items-center justify-between gap-4">
-              <p className="text-sm text-neutral-500">Step {step} of 7</p>
-              {preview ? (
-                <label className="field">
-                  <span className="sr-only">Jump to onboarding step</span>
-                  <select
-                    value={step}
-                    onChange={(e) => {
-                      setStep(Number(e.target.value));
-                      setError("");
-                      setErrors({});
-                    }}
-                  >
-                    {biodataSteps.map((s, i) => (
-                      <option value={i + 1} key={s.title}>
-                        {i + 1}. {s.title}
-                      </option>
-                    ))}
-                  </select>
-                </label>
-              ) : (
-                <p className="text-xs text-neutral-500">
-                  {saved ? "Progress saved" : "Save and return anytime"}
-                </p>
-              )}
-            </div>
-            <div className="h-1.5 rounded-full bg-neutral-200">
-              <div
-                className="h-full rounded-full bg-brand-gold"
-                style={{ width: `${(step / 7) * 100}%` }}
-              />
-            </div>
-            {preview && (
-              <p className="text-sm text-neutral-500">
-                You can skip fields and switch steps in preview.
-              </p>
-            )}
+            <section className="kyc-progress">
+              <div className="flex justify-between gap-4 items-center"><div><p className="text-xs tracking-widest text-brand-gold mb-2">STEP {step} OF 7</p><h1>{definition.title}</h1></div><p className="text-sm text-neutral-500">{Math.round(((step - 1) / 7) * 100)}% completed</p></div>
+              <div className="kyc-progress-track"><div style={{width: `${((step - 1) / 7) * 100}%`}} /></div>
+              <nav className="kyc-step-tabs" aria-label="KYC progress">{biodataSteps.map((s, i) => <button type="button" key={s.title} aria-current={step === i + 1 ? "step" : undefined} className={step === i + 1 ? "active" : ""} disabled={!preview && i + 1 > step} onClick={() => {setStep(i + 1);setError("");setErrors({});}}><span><FigmaIcon file={(["98482.svg", "18d9b.svg", "1c1d4.svg", "02d9a.svg", "2ea96.svg", "18d9b.svg", "d3969.svg"] as const)[i]} />{i + 1}</span>{["Personal", "Contact", "Identity", "Occupation", "Next of Kin", "Bank Account", "Declaration"][i]}</button>)}</nav>
+              {preview && <label className="field mt-4"><span className="text-xs">Preview: jump to any step</span><select aria-label="Jump to onboarding step" value={step} onChange={e => setStep(Number(e.target.value))}>{biodataSteps.map((s,i) => <option key={s.title} value={i+1}>{i+1}. {s.title}</option>)}</select></label>}
+              {saved && <p role="status" className="text-xs mt-3">Progress saved</p>}
+            </section>
             <form
-              className="panel space-y-6"
+              className="kyc-form panel"
               noValidate
               onSubmit={(e) => {
                 e.preventDefault();
                 save(step === 7);
               }}
             >
-              <h2 className="text-xl font-semibold">{definition.title}</h2>
+              <div className="kyc-form-heading"><h2>{step}. {definition.title}</h2></div>
               {step < 7 ? (
                 <div className="grid sm:grid-cols-2 gap-5">
                   {definition.fields
@@ -161,7 +127,7 @@ export default function Biodata() {
                         ),
                     )
                     .map((f) => (
-                      <label className="field" key={f.key}>
+                      <label className={`field ${["fullName", "maritalStatus", "residentialAddress", "businessAddress", "nokAddress"].includes(f.key) ? "sm:col-span-2" : ""}`} key={f.key}>
                         {f.label}
                         {f.key === "bankCode" ? (
                           <select
@@ -201,7 +167,7 @@ export default function Biodata() {
                             inputMode={
                               f.key === "accountNumber" ? "numeric" : undefined
                             }
-                            readOnly={["email", "country"].includes(f.key)}
+                            readOnly={["fullName", "email", "country"].includes(f.key)}
                             value={data[f.key] || ""}
                             onChange={(e) => field(f.key, e.target.value)}
                             aria-invalid={!!errors[f.key]}
@@ -222,7 +188,7 @@ export default function Biodata() {
                       <details
                         key={s.title}
                         className="border-b pb-4"
-                        open={i === 0}
+                        open
                       >
                         <summary className="font-medium cursor-pointer">
                           {s.title}
@@ -312,7 +278,7 @@ export default function Biodata() {
                   ))}
                 </>
               )}
-              <div className="flex flex-wrap gap-3 justify-between border-t pt-5">
+              <div className="kyc-form-actions flex flex-wrap gap-3 justify-between border-t pt-5">
                 <div className="flex flex-wrap gap-2">
                   <button
                     type="button"
@@ -340,7 +306,7 @@ export default function Biodata() {
                     ? "Saving…"
                     : step === 7
                       ? "Submit for review"
-                      : "Continue"}
+                      : "Save & Continue"}
                 </button>
               </div>
             </form>
@@ -348,6 +314,6 @@ export default function Biodata() {
         )}
         {!data && !error && <div className="panel">Loading profile…</div>}
       </div>
-    </PortalShell>
+    <InvestorFooter /></div>
   );
 }

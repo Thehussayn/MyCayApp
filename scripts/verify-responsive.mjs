@@ -23,6 +23,8 @@ try {
   await page.goto(base + "/portal/biodata");
   await page.getByLabel("Jump to onboarding step").selectOption("7");
   await page.getByText("Digital signature", { exact: true }).waitFor();
+  await page.goto(base + "/portal/dashboard", {waitUntil:"domcontentloaded", timeout:90000});
+  await page.getByRole("heading", {name: "Welcome, Alex."}).waitFor();
   await page.getByLabel("Open navigation", { exact: true }).click();
   await page.getByRole("dialog").waitFor();
   await page.keyboard.press("Escape");
@@ -61,9 +63,12 @@ try {
   await page
     .getByText("Finance is reviewing your withdrawal request.", { exact: true })
     .waitFor();
-  for (const width of [360, 390, 768, 1280]) {
+  for (const width of [360, 390, 768, 1280, 1680]) {
     await page.setViewportSize({ width, height: 900 });
     for (const route of [
+      "/register",
+      "/login",
+      "/portal/onboarding-complete",
       "/forgot-password",
       "/reset-password",
       "/portal/status",
@@ -78,7 +83,7 @@ try {
       "/portal/settings",
       detail,
     ]) {
-      await page.goto(base + route);
+      await page.goto(base + route, {waitUntil:"domcontentloaded", timeout:90000});
       await page.waitForTimeout(250);
       assert.ok(
         await page.evaluate(
@@ -120,7 +125,7 @@ try {
   for (const width of [360, 1280]) {
     await page.setViewportSize({ width, height: 900 });
     for (const route of ["/admin", "/admin/investors", "/admin/finance", "/admin/content", "/admin/users", "/admin/audit", "/admin/settings"]) {
-      await page.goto(base + route);
+      await page.goto(base + route, {waitUntil:"domcontentloaded", timeout:90000});
       await page.waitForTimeout(250);
       assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1), `${route} overflows at ${width}px`);
       assert.equal(await page.getByText("Application error:", { exact: false }).count(), 0);

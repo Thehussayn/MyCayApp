@@ -1,6 +1,8 @@
 "use client";
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { FigmaIcon } from "@/components/portal/FigmaAsset";
+import Currency from "@/components/portal/Currency";
 import PortalShell from "@/components/portal/PortalShell";
 import { usePortal, request } from "@/components/portal/usePortal";
 export default function Settings() {
@@ -51,7 +53,7 @@ export default function Settings() {
   }
   return (
     <PortalShell user={user} currentTitle="Settings">
-      <div className="max-w-3xl mx-auto space-y-6">
+      <div className="max-w-5xl mx-auto space-y-6">
         {error && (
           <p className="error" role="alert">
             {error}
@@ -67,6 +69,34 @@ export default function Settings() {
             Set a new password to continue using your account.
           </p>
         )}
+        <form
+          className="panel space-y-5"
+          onSubmit={(e) => {
+            e.preventDefault();
+            patch({ action: "PREFERENCES", preferences: prefs });
+          }}
+        >
+          <div className="investor-settings-title"><FigmaIcon file="f0899.svg"/><div><h2>Notification Preferences</h2><p>Choose which updates you receive.</p></div></div>
+          <div className="investor-preferences">{[
+            ["emailAlerts", "Email Disbursement Alerts", "Receive email updates about payouts."],
+            ["smsAlerts", "SMS Transaction Alerts", "Receive transaction updates by SMS."],
+            ["quarterlyDigest", "Quarterly Investment Digest", "Receive a quarterly portfolio summary."],
+          ].map(([key, title, description]) => (
+            <label key={key} className="investor-preference flex gap-3 items-center text-sm">
+              <div><strong>{title}</strong><p>{description}</p></div><input
+                type="checkbox"
+                checked={(prefs as any)[key]}
+                onChange={(e) =>
+                  setPrefs({ ...prefs, [key]: e.target.checked })
+                }
+              />
+            </label>
+          ))}</div>
+          <div className="flex items-center justify-between text-sm"><span>Display currency</span><Currency /></div>
+          <button className="action secondary" disabled={busy}>
+            Save preferences
+          </button>
+        </form>
         <form
           className="panel space-y-5"
           onSubmit={async (e) => {
@@ -91,7 +121,7 @@ export default function Settings() {
             }
           }}
         >
-          <h2 className="font-semibold text-lg">Change password</h2>
+          <div className="investor-settings-title"><FigmaIcon file="ae21e.svg"/><div><h2>Change Password</h2><p>Update your login credentials.</p></div></div>
           <label className="field">
             Current password
             <input
@@ -131,34 +161,7 @@ export default function Settings() {
             Update password
           </button>
         </form>
-        <form
-          className="panel space-y-5"
-          onSubmit={(e) => {
-            e.preventDefault();
-            patch({ action: "PREFERENCES", preferences: prefs });
-          }}
-        >
-          <h2 className="font-semibold text-lg">Notification preferences</h2>
-          {[
-            ["emailAlerts", "Email updates"],
-            ["smsAlerts", "SMS updates"],
-            ["quarterlyDigest", "Quarterly summary"],
-          ].map(([key, title]) => (
-            <label key={key} className="flex gap-3 items-center text-sm">
-              <input
-                type="checkbox"
-                checked={(prefs as any)[key]}
-                onChange={(e) =>
-                  setPrefs({ ...prefs, [key]: e.target.checked })
-                }
-              />
-              {title}
-            </label>
-          ))}
-          <button className="action secondary" disabled={busy}>
-            Save preferences
-          </button>
-        </form>
+        <section className="panel space-y-3"><h2 className="investor-panel-heading">Security standards</h2><p className="text-sm text-neutral-500">For help changing verified identity or bank details, contact our team.</p><Link className="investor-text-link" href="/contact">Contact support</Link></section>
         {user && user.role !== "INVESTOR" && (
           <Link className="action" href="/admin">
             Return to operations

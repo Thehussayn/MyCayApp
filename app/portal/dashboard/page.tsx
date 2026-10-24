@@ -3,167 +3,21 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import PortalShell from "@/components/portal/PortalShell";
 import { usePortal, request } from "@/components/portal/usePortal";
-import { Metric, Status } from "@/components/portal/Investments";
+import { Status } from "@/components/portal/Investments";
 import { useMoney } from "@/components/portal/Currency";
 export default function Dashboard() {
-  const money = useMoney();
-  const { user, preview } = usePortal();
-  const [investments, setInvestments] = useState<any[]>([]),
-    [notifications, setNotifications] = useState<any[]>([]),
-    [error, setError] = useState(""),
-    [loading, setLoading] = useState(true);
-  useEffect(() => {
-    if (!user) return;
-    Promise.all([
-      request("/api/portal/investments"),
-      request("/api/portal/notifications"),
-    ])
-      .then(([i, n]) => {
-        setInvestments([...i.giap, ...i.wealthStream]);
-        setNotifications(n.notifications.slice(0, 5));
-      })
-      .catch((e) => setError(e.message))
-      .finally(() => setLoading(false));
-  }, [user]);
-  const active = investments.filter(
-    (i) => !["CLOSED", "COMPLETED", "EXITED"].includes(i.status),
-  );
-  const capital = active.reduce((s, i) => s + i.capitalKobo / 100, 0),
-    earnings = investments.reduce(
-      (s, i) => s + (i.totalPayoutsReceived || i.realizedInvestorProfit || 0),
-      0,
-    );
-  const next = active
-    .filter((i) => i.nextPayoutDate)
-    .sort((a, b) => a.nextPayoutDate.localeCompare(b.nextPayoutDate))[0];
-  return (
-    <PortalShell user={user}>
-      <div className="max-w-6xl mx-auto space-y-7">
-        <div className="flex flex-wrap items-center justify-between gap-4">
-          <div>
-            <h1 className="workspace-title">
-              Hello{user?.fullName ? `, ${user.fullName.split(" ")[0]}` : ""}
-            </h1>
-            <p className="text-sm text-neutral-500 mt-2">
-              Your investments at a glance.
-            </p>
-          </div>
-          <Link className="action" href="/portal/investments/new">
-            New investment
-          </Link>
-        </div>
-        {error && (
-          <p className="error" role="alert">
-            {error}
-          </p>
-        )}
-        {user?.kycStatus !== "APPROVED" && (
-          <div className="notice flex flex-wrap justify-between items-center gap-4">
-            <div>
-              <p className="font-semibold">
-                {["SUBMITTED", "UNDER_REVIEW"].includes(user?.kycStatus || "")
-                  ? "Your profile is under review"
-                  : "Complete your profile"}
-              </p>
-              <p className="text-sm mt-1">
-                {["SUBMITTED", "UNDER_REVIEW"].includes(user?.kycStatus || "")
-                  ? "We’ll let you know when verification is complete."
-                  : "Add your details and documents to start investing."}
-              </p>
-            </div>
-            <Link
-              className="action secondary"
-              href={
-                ["SUBMITTED", "UNDER_REVIEW"].includes(user?.kycStatus || "")
-                  ? "/portal/verification"
-                  : "/portal/biodata"
-              }
-            >
-              View profile
-            </Link>
-          </div>
-        )}
-        <div className="grid sm:grid-cols-2 xl:grid-cols-4 gap-4">
-          <div className="panel">
-            <Metric title="Invested capital" value={money(capital)} />
-          </div>
-          <div className="panel">
-            <Metric title="Earnings to date" value={money(earnings)} />
-          </div>
-          <div className="panel">
-            <Metric title="Open investments" value={active.length} />
-          </div>
-          <div className="panel">
-            <Metric
-              title="Next payout"
-              value={next ? money(next.nextPayoutAmount) : "—"}
-            />
-            {next && (
-              <p className="text-xs text-neutral-500 mt-2">
-                {next.nextPayoutDate}
-              </p>
-            )}
-          </div>
-        </div>
-        <section className="panel space-y-5">
-          <div className="flex flex-wrap justify-between gap-3">
-            <h2 className="font-semibold text-lg">My investments</h2>
-            <Link className="text-sm underline" href="/portal/investments">
-              View all
-            </Link>
-          </div>
-          {loading ? (
-            <p className="text-sm text-neutral-500">Loading…</p>
-          ) : active.length ? (
-            active.slice(0, 4).map((i) => (
-              <Link
-                className="flex flex-wrap justify-between gap-4 py-4 border-t"
-                key={i.id}
-                href={`/portal/investments/${i.id}`}
-              >
-                <div>
-                  <p className="font-semibold">
-                    {"principal" in i ? "WealthStream" : "GIAP"}
-                  </p>
-                  <p className="text-sm text-neutral-500 mt-1">
-                    {money(i.capitalKobo / 100)}
-                  </p>
-                </div>
-                <Status value={i.status} />
-              </Link>
-            ))
-          ) : (
-            <div className="py-8 text-center">
-              <h3 className="font-medium">No investments yet</h3>
-              <p className="text-sm text-neutral-500 mt-2 mb-5">
-                Choose a plan when you’re ready.
-              </p>
-              <Link className="action secondary" href="/portal/investments/new">
-                View plans
-              </Link>
-            </div>
-          )}
-        </section>
-        <section className="panel space-y-5">
-          <h2 className="font-semibold text-lg">Recent activity</h2>
-          {notifications.length ? (
-            notifications.map((n) => (
-              <Link
-                key={n.id}
-                className="block border-t pt-4"
-                href={n.actionUrl || "/portal/notifications"}
-              >
-                <p className="text-sm font-medium">{n.title}</p>
-                <p className="text-sm text-neutral-500 mt-1">{n.message}</p>
-              </Link>
-            ))
-          ) : (
-            <p className="text-sm text-neutral-500">
-              Your account updates will appear here.
-            </p>
-          )}
-        </section>
-      </div>
-    </PortalShell>
-  );
+ const {user}=usePortal(), money=useMoney();
+ const [investments,setInvestments]=useState<any[]>([]),[transactions,setTransactions]=useState<any[]>([]),[error,setError]=useState(""),[loading,setLoading]=useState(true);
+ useEffect(()=>{if(user) Promise.all([request("/api/portal/investments"),request("/api/portal/transactions")]).then(([i,t])=>{setInvestments([...i.giap.map((x:any)=>({...x,plan:"GIAP"})),...i.wealthStream.map((x:any)=>({...x,plan:"WealthStream"}))]);setTransactions(t.transactions.slice(0,5));}).catch(e=>setError(e.message)).finally(()=>setLoading(false));},[user]);
+ const active=investments.filter(i=>!["CLOSED","COMPLETED","EXITED"].includes(i.status));
+ const capital=active.reduce((s,i)=>s+i.capitalKobo/100,0),earnings=investments.reduce((s,i)=>s+(i.totalPayoutsReceived||i.realizedInvestorProfit||0),0);
+ const approved=user?.kycStatus==="APPROVED", submitted=["SUBMITTED","UNDER_REVIEW"].includes(user?.kycStatus||"");
+ return <PortalShell user={user}><div className="space-y-8">
+ {error&&<p className="error" role="alert">{error}</p>}
+ <section className={`investor-hero ${active.length?"":"welcome"}`}><div><h1>{active.length?"Welcome back":"Welcome"}{user?.fullName?`, ${user.fullName.split(" ")[0]}`:""}.</h1><p>{active.length?"Manage your investments and track your returns.":approved?"Your account is verified. You can now start an investment.":submitted?"Your KYC has been submitted for staff review.":"Complete your seven-step KYC to activate your investment account."}</p></div><Link className="action" href={approved||active.length?"/portal/investments/new":submitted?"/portal/verification":"/portal/biodata"}>{approved||active.length?"New Investment":submitted?"View verification status":"Complete Biodata"} <span aria-hidden>→</span></Link></section>
+ {!approved&&<section className="panel"><div className="investor-panel-heading"><h2>Account verification</h2></div><div className="investor-verification-grid"><article className="investor-milestone"><div>01 · Registration <span>Completed</span></div><h3>Account created</h3><p>You have access to your investor portal.</p></article><article className="investor-milestone pending"><div>02 · KYC <Status value={user?.kycStatus||"NOT_STARTED"}/></div><h3>Seven-step KYC</h3><p>{submitted?"Staff will review your submitted details and documents.":"Add your personal details, identification and bank information."}</p></article></div></section>}
+ {active.length>0&&<section><h2 className="investor-section-title">Portfolio Overview</h2><dl className="investor-metrics">{[["Total invested",money(capital)],["Portfolio value",money(active.reduce((s,i)=>s+(i.currentEvaluation||i.capitalKobo/100),0))],["Payouts received",money(earnings)],["Active holdings",active.length]].map(([title,value],i)=><div key={title} className={`investor-metric ${i===2?"accent":""}`}><dt>{title}</dt><dd>{value}</dd></div>)}</dl></section>}
+ <section className="panel">{loading?<p className="text-sm text-neutral-500">Loading…</p>:active.length?<><div className="investor-panel-heading"><h2>Investment allocations</h2><Link className="investor-text-link" href="/portal/investments">View all investments →</Link></div>{active.slice(0,4).map(i=><article className="investor-allocation" key={i.id}><div><div className="investor-allocation-title"><strong>{i.plan}</strong><Status value={i.status}/></div><p>{i.referenceId}</p><Link className="investor-text-link mt-3" href={`/portal/investments/${i.id}`}>View investment →</Link></div><dl className="investor-allocation-values"><div><dt>Invested capital</dt><dd>{money(i.capitalKobo/100)}</dd></div><div><dt>{i.plan==="GIAP"?"Current valuation":"Payouts received"}</dt><dd>{money(i.plan==="GIAP"?(i.currentEvaluation||i.capitalKobo/100):(i.totalPayoutsReceived||0))}</dd></div></dl></article>)}</>:<div className="investor-empty"><span aria-hidden className="text-brand-gold text-3xl">◇</span><h2>No active investments</h2><p>Your GIAP and WealthStream investments will appear here.</p><Link className="action secondary" href="/portal/investments/new">View investment plans</Link></div>}</section>
+ {active.length>0&&<section className="panel"><div className="investor-panel-heading"><h2>Recent financial activity</h2><Link className="investor-text-link" href="/portal/transactions">View ledger →</Link></div>{transactions.length?transactions.map(t=><div className="investor-ledger-row" key={t.id}><span className="investor-ledger-marker" aria-hidden>{t.direction==="CREDIT"?"↙":"↗"}</span><div><h3>{t.title}</h3><p>{t.date} · {t.reference}</p></div><div className="investor-ledger-amount">{t.direction==="CREDIT"?"+":""}{money(t.amount)}<small>{t.status}</small></div></div>):<p className="text-sm text-neutral-500">No transactions yet.</p>}</section>}
+ </div></PortalShell>;
 }

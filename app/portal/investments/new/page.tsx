@@ -86,7 +86,7 @@ export default function NewInvestment() {
   }
   return (
     <PortalShell user={user}>
-      <div className="max-w-3xl mx-auto space-y-6">
+      <div className="investment-creation max-w-3xl mx-auto space-y-6">
         <Link
           className="inline-flex gap-2 items-center text-sm text-neutral-500"
           href="/portal/investments"

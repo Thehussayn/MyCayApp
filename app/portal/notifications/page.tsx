@@ -32,7 +32,7 @@ export default function Notifications() {
       setError((e as Error).message);
     }
   }
-  const filtered = list.filter((n) => filter === "ALL" || !n.isRead);
+  const filtered = list.filter((n) => filter === "ALL" || (filter === "UNREAD" ? !n.isRead : n.category === filter));
   return (
     <PortalShell
       user={user}
@@ -42,14 +42,14 @@ export default function Notifications() {
       <div className="max-w-4xl mx-auto space-y-5">
         {error && <p className="error">{error}</p>}
         <div className="flex flex-wrap justify-between gap-3">
-          <div className="flex gap-2">
-            {["ALL", "UNREAD"].map((f) => (
+          <div className="investor-tabs flex flex-wrap gap-2">
+            {["ALL", "UNREAD", "PAYOUT", "INVESTMENT", "DOCUMENT", "KYC", "ANNOUNCEMENT"].map((f) => (
               <button
                 key={f}
                 className={`action ${filter === f ? "" : "secondary"}`}
                 onClick={() => setFilter(f)}
               >
-                {f === "ALL" ? "All" : "Unread"}
+                {f.charAt(0) + f.slice(1).toLowerCase()}
               </button>
             ))}
           </div>
@@ -62,13 +62,13 @@ export default function Notifications() {
           </button>
         </div>
         {filtered.map((n) => (
-          <article className="panel space-y-3" key={n.id}>
+          <article className={`investor-notification ${n.isRead ? "" : "unread"}`} key={n.id}>
             <div className="flex items-start gap-3">
               <span
                 className={`mt-2 w-2 h-2 rounded-full shrink-0 ${n.isRead ? "bg-neutral-200" : "bg-brand-gold"}`}
               />
               <div className="min-w-0 flex-1">
-                <h2 className="font-semibold">{n.title}</h2>
+                <p className="investor-notification-category">{n.category}</p><h2 className="font-semibold">{n.title}</h2>
                 <p className="text-sm text-neutral-600 mt-2">{n.message}</p>
                 <p className="text-xs text-neutral-400 mt-3">
                   {new Date(n.timestamp).toLocaleString()}

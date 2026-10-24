@@ -32,7 +32,9 @@ const COUNTRIES = [
 export default function RegisterPage() {
   const router = useRouter();
 
-  const [fullName, setFullName] = useState("");
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const fullName = `${firstName.trim()} ${lastName.trim()}`.trim();
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("+234 ");
   const [country, setCountry] = useState("Nigeria");
@@ -56,7 +58,7 @@ export default function RegisterPage() {
     e.preventDefault();
     setErrorMessage("");
 
-    if (!fullName.trim() || fullName.trim().length < 2) {
+    if (!firstName.trim() || !lastName.trim()) {
       setErrorMessage("Please enter your full legal name.");
       return;
     }
@@ -140,7 +142,7 @@ export default function RegisterPage() {
   return (
     <AuthShell
       kicker="MyCayApp"
-      title="Create Investor Account"
+      title="Create Account"
       subtitle="Create your account, then complete your KYC in the portal."
     >
       <form onSubmit={handleSubmit} noValidate className="space-y-5">
@@ -150,23 +152,13 @@ export default function RegisterPage() {
           </div>
         )}
 
-        {/* Full Name */}
-        <div>
-          <label
-            htmlFor="fullName"
-            className="block text-xs uppercase tracking-wider font-semibold text-[#252A2D] mb-1.5"
-          >
-            Full Legal Name <span className="text-[#BE933C]">*</span>
-          </label>
-          <input
-            id="fullName"
-            type="text"
-            required
-            value={fullName}
-            onChange={(e) => setFullName(e.target.value)}
-            placeholder="e.g. Prince Adeleke Abdulrasheed"
-            className="w-full px-4 py-3 text-sm bg-white border border-neutral-300 rounded-sm text-[#252A2D] placeholder-neutral-400 focus:outline-none focus:border-[#BE933C] focus:ring-1 focus:ring-[#BE933C] transition-colors"
-          />
+        <div className="grid sm:grid-cols-2 gap-4">
+          {[["firstName", "First Name", firstName, setFirstName], ["lastName", "Last Name", lastName, setLastName]].map(([id, label, value, setter]) => (
+            <label key={id as string} className="field" htmlFor={id as string}>
+              <span>{label as string} <span className="text-brand-gold">*</span></span>
+              <input id={id as string} autoComplete={id === "firstName" ? "given-name" : "family-name"} required value={value as string} onChange={e => (setter as (v: string) => void)(e.target.value)} />
+            </label>
+          ))}
         </div>
 
         {/* Email Address */}
