@@ -14,3 +14,4 @@
 .admin-workspace .data-table{position:relative}
 .admin-workspace .admin-account .action{width:72px;min-height:24px;padding:6px;font-size:8px;border-radius:4px}
 @media(max-width:1023px){.admin-workspace .admin-account .action{min-height:36px;font-size:10px}}
+.admin-workspace .status.published{background:#eaf4ed;color:#286340}.admin-workspace .status.draft,.admin-workspace .status.due,.admin-workspace .status.scheduled{background:#fbf3de;color:#80611c}
