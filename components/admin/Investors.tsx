@@ -1,5 +1,6 @@
 "use client";
-import { useState } from "react";
+import { AdminMetrics } from "./Design";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import { Metric, Status, label } from "@/components/portal/Investments";
@@ -12,11 +13,13 @@ import Audit from "./Audit";
 import { biodataSteps } from "@/lib/kyc/fields";
 export default function Investors({
   data,
+  counts,
+  onTitleChange,
   investorId,
   canReview,
   busy,
   act,
-}: { data: any; investorId?: string; canReview: boolean } & ActionProps) {
+}: { data: any; counts?: Record<string, number>; onTitleChange?: (title: string) => void; investorId?: string; canReview: boolean } & ActionProps) {
   const [query, setQuery] = useState(""),
     [status, setStatus] = useState("ALL"),
     [reason, setReason] = useState(""),
@@ -29,6 +32,7 @@ export default function Investors({
       country: "Nigeria",
       password: "",
     });
+  useEffect(() => {onTitleChange?.(create ? "Add investor" : investorId ? "Investor profile" : "Investors")},[create,investorId,onTitleChange]);
   const selected = data.investors.find((u: any) => u.id === investorId);
   const investors = data.investors.filter(
     (u: any) =>
@@ -144,7 +148,7 @@ export default function Investors({
                     <section className="border-t pt-5 space-y-2">
                       <h3 className="font-semibold">Declaration & signature</h3>
                       <p className="text-sm">{selected.biodata.digitalSignature}</p>
-                      <p className="text-xs text-neutral-500">Submitted {new Date(selected.biodata.submittedAt).toLocaleDateString("en-GB")}</p>
+                      <p className="text-xs text-neutral-500">Submitted {new Date(selected.biodata.submittedAt).toLocaleDateString("en-GB", {day:"numeric",month:"short",year:"numeric"})}</p>
                     </section>
                   )}
                 </div>
@@ -315,11 +319,13 @@ export default function Investors({
     );
   return (
     <>
+      {!create && <AdminMetrics items={[["Investors",counts?.investors ?? data.investors.length],["Awaiting review",counts?.pending],["Withdrawal requests",counts?.withdrawals]]}/>}
+      {!create && <section className="panel admin-directory"><div className="admin-directory-toolbar"><h2>Investor directory</h2>
       <div className="flex flex-wrap gap-3">
         <label className="field flex-1">
           <span className="sr-only">Search investors</span>
           <input
-            placeholder="Search name, email, phone, country"
+            placeholder="Name, email or reference"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
           />
@@ -331,6 +337,8 @@ export default function Investors({
               "ALL",
               "NOT_STARTED",
               "BIODATA_IN_PROGRESS",
+              "BIODATA_SUBMITTED",
+              "DOCUMENTS_PENDING",
               "APPROVED",
               "INFO_REQUESTED",
               "REJECTED",
@@ -338,7 +346,7 @@ export default function Investors({
               "UNDER_REVIEW",
             ].map((s) => (
               <option key={s} value={s}>
-                {label(s)}
+                {s === "ALL" ? "All KYC statuses" : label(s)}
               </option>
             ))}
           </select>
@@ -365,6 +373,41 @@ export default function Investors({
           Add investor
         </button>
       </div>
+      </div><div className="admin-directory-table">
+        <div className="overflow-x-auto" role="region" aria-label="Investor directory" tabIndex={0}>
+          <table className="w-full table-fixed text-sm text-left lg:table-auto">
+            <caption className="sr-only">Investors and submitted KYC status</caption>
+            <thead className="bg-neutral-50 text-xs text-neutral-500">
+              <tr>
+                <th scope="col" className="p-4 font-medium w-[42%] lg:w-auto">Investor</th>
+                <th scope="col" className="p-4 font-medium hidden lg:table-cell">Email</th>
+                <th scope="col" className="p-4 font-medium hidden xl:table-cell">Country</th>
+                <th scope="col" className="p-4 font-medium">KYC status</th>
+                <th scope="col" className="p-4 font-medium hidden xl:table-cell">Registered</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y">
+              {investors.map((u: any) => (
+                <tr key={u.id} className="hover:bg-neutral-50 align-top">
+                  <th scope="row" className="p-4 font-medium break-words">
+                    <Link href={`/admin/investors/${encodeURIComponent(u.id)}`} aria-label={`View ${u.fullName}`} className="hover:underline underline-offset-4">{u.fullName}</Link>
+                    <p className="text-xs text-neutral-500 font-normal mt-1 hidden lg:block">{u.referenceId}</p>
+                    <p className="text-xs text-neutral-500 font-normal mt-1 lg:hidden">{new Date(u.createdAt).toLocaleDateString("en-GB", {day:"numeric",month:"short",year:"numeric"})}</p>
+                  </th>
+                  <td className="p-4 hidden lg:table-cell break-all">{u.email}</td>
+                  <td className="p-4 hidden xl:table-cell">{u.country}</td>
+                  <td className="p-4">
+                    <Status value={u.kycStatus || "NOT_STARTED"} />
+                    <Link className="action secondary admin-investor-mobile-action !px-2 mt-3 w-full text-center" href={`/admin/investors/${encodeURIComponent(u.id)}`}>View investor</Link>
+                  </td>
+                  <td className="p-4 whitespace-nowrap hidden xl:table-cell">{new Date(u.createdAt).toLocaleDateString("en-GB", {day:"numeric",month:"short",year:"numeric"})}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+      </section>}
       {create && (
         <form
           className="panel space-y-5"
@@ -408,48 +451,10 @@ export default function Investors({
             The investor must change their temporary password and complete
             verification before investing.
           </p>
-          <button disabled={busy} className="action">
-            Create account
-          </button>
+          <div className="flex gap-3"><button disabled={busy} className="action">Create investor</button><button type="button" className="action secondary" onClick={() => setCreate(false)}>Cancel</button></div>
         </form>
       )}
-      <div className="panel !p-0 overflow-hidden">
-        <div className="overflow-x-auto" role="region" aria-label="Investor directory" tabIndex={0}>
-          <table className="w-full table-fixed text-sm text-left lg:table-auto">
-            <caption className="sr-only">Investors and submitted KYC status</caption>
-            <thead className="bg-neutral-50 text-xs text-neutral-500">
-              <tr>
-                <th scope="col" className="p-4 font-medium w-[42%] lg:w-auto">Investor</th>
-                <th scope="col" className="p-4 font-medium hidden lg:table-cell">Email</th>
-                <th scope="col" className="p-4 font-medium hidden xl:table-cell">Country</th>
-                <th scope="col" className="p-4 font-medium">KYC status</th>
-                <th scope="col" className="p-4 font-medium hidden xl:table-cell">Registered</th>
-                <th scope="col" className="p-4 font-medium hidden lg:table-cell"><span className="sr-only">Actions</span></th>
-              </tr>
-            </thead>
-            <tbody className="divide-y">
-              {investors.map((u: any) => (
-                <tr key={u.id} className="hover:bg-neutral-50 align-top">
-                  <th scope="row" className="p-4 font-medium break-words">
-                    <Link href={`/admin/investors/${encodeURIComponent(u.id)}`} className="hover:underline underline-offset-4">{u.fullName}</Link>
-                    <p className="text-xs text-neutral-500 font-normal mt-1 hidden lg:block">{u.referenceId}</p>
-                    <p className="text-xs text-neutral-500 font-normal mt-1 lg:hidden">{new Date(u.createdAt).toLocaleDateString("en-GB")}</p>
-                  </th>
-                  <td className="p-4 hidden lg:table-cell break-all">{u.email}</td>
-                  <td className="p-4 hidden xl:table-cell">{u.country}</td>
-                  <td className="p-4">
-                    <Status value={u.kycStatus || "NOT_STARTED"} />
-                    <Link className="action secondary !px-2 mt-3 w-full text-center lg:hidden" href={`/admin/investors/${encodeURIComponent(u.id)}`} aria-label={`View ${u.fullName}`}>View investor</Link>
-                  </td>
-                  <td className="p-4 whitespace-nowrap hidden xl:table-cell">{new Date(u.createdAt).toLocaleDateString("en-GB")}</td>
-                  <td className="p-4 hidden lg:table-cell"><Link className="action secondary whitespace-nowrap" href={`/admin/investors/${encodeURIComponent(u.id)}`} aria-label={`View ${u.fullName}`}>View investor</Link></td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </div>
-      {!investors.length && (
+      {!create && !investors.length && (
         <div className="panel text-sm text-neutral-500">
           No investors match this view.
         </div>

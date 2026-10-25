@@ -1,6 +1,7 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
+import { AdminMetrics } from "./Design";
 import { Metric, Status, label } from "@/components/portal/Investments";
 import { formatCurrency as money } from "@/lib/utils";
 
@@ -11,7 +12,8 @@ export default function Finance({
   data,
   busy,
   act,
-}: { data: any } & ActionProps) {
+  onTitleChange,
+}: { data: any; onTitleChange?: (title: string) => void } & ActionProps) {
   const [tab, setTab] = useState("ledger"),
     [selected, setSelected] = useState(""),
     [reference, setReference] = useState(""),
@@ -39,14 +41,16 @@ export default function Finance({
   };
   const current = investments.find((i: any) => i.id === selected);
   const today = new Date().toISOString().slice(0, 10);
+  useEffect(() => {onTitleChange?.(({ledger:"Investment ledger",payouts:"Payouts",withdrawals:"Withdrawal review",reconciliation:"Bank reconciliation",reports:"Reports & exchange rate"} as Record<string,string>)[tab])},[tab,onTitleChange]);
   return (
     <>
-      <div className="flex flex-wrap gap-2">
+      <div className="admin-finance-tabs">
         {["ledger", "payouts", "withdrawals", "reconciliation", "reports"].map(
           (t) => (
             <button
               key={t}
-              className={`action capitalize ${tab === t ? "" : "secondary"}`}
+              className={`action capitalize ${tab === t ? "active" : "secondary"}`}
+              aria-pressed={tab === t}
               onClick={() => {
                 setTab(t);
                 setSelected("");
@@ -60,7 +64,8 @@ export default function Finance({
       </div>
       {tab === "ledger" && (
         <>
-          <div className="panel">
+          <div className="admin-finance-metrics"><AdminMetrics items={[["Capital under management",money(investments.filter((i:any)=>!["CLOSED","COMPLETED","EXITED"].includes(i.status)).reduce((sum:number,i:any)=>sum+i.capitalKobo/100,0))],["Open investments",investments.filter((i:any)=>!["CLOSED","COMPLETED","EXITED"].includes(i.status)).length],["Awaiting allocation",data.giap.filter((i:any)=>i.status==="FUNDED").length]]}/></div>
+          <div className="panel"><h2 className="admin-finance-panel-heading">Investment ledger</h2>
             <div className="data-table">
               <table>
                 <thead>
@@ -239,11 +244,12 @@ export default function Finance({
       )}
       {tab === "payouts" && (
         <div className="space-y-4">
+          <section className="panel"><h2 className="admin-finance-panel-heading">Payout schedule</h2><div className="data-table"><table><thead><tr><th>Investor</th><th>Investment</th><th>Due date</th><th>Amount</th><th>Status</th><th><span className="sr-only">Actions</span></th></tr></thead><tbody>{data.payouts.filter((p:any)=>p.status!=="COMPLETED").sort((a:any,b:any)=>a.payoutDate.localeCompare(b.payoutDate)).map((p:any)=><tr key={p.id}><td>{name(p.userId)}</td><td>{investments.find((i:any)=>i.id===p.investmentId)?.referenceId}</td><td>{p.payoutDate}</td><td>{money(p.amount)}</td><td><Status value={p.payoutDate<=today?"DUE":"SCHEDULED"}/></td><td><button className="action secondary" disabled={p.payoutDate>today} onClick={()=>{setSelected(p.id);setReference("")}}>Record transfer</button></td></tr>)}</tbody></table></div>{!data.payouts.some((p:any)=>p.status!=="COMPLETED")&&<p className="text-sm text-neutral-500 py-4">No payouts scheduled.</p>}</section>
           {data.payouts
-            .filter((p: any) => p.status !== "COMPLETED")
+            .filter((p: any) => p.status !== "COMPLETED" && p.id === selected)
             .sort((a: any, b: any) => a.payoutDate.localeCompare(b.payoutDate))
             .map((p: any) => (
-              <div className="panel space-y-4" key={p.id}>
+              <div className="panel space-y-4" key={p.id}><h2>Record completed payout</h2>
                 <div className="flex flex-wrap gap-3 justify-between">
                   <div>
                     <h2 className="font-semibold">
@@ -289,7 +295,7 @@ export default function Finance({
                     </label>
                     <button className="action" disabled={busy}>
                       Record completed payout
-                    </button>
+                    </button><button type="button" className="action secondary" onClick={()=>setSelected("")}>Cancel</button>
                   </form>
                 ) : (
                   p.payoutDate <= today && (
@@ -306,11 +312,7 @@ export default function Finance({
                 )}
               </div>
             ))}
-          {!data.payouts.some((p: any) => p.status !== "COMPLETED") && (
-            <div className="panel text-sm text-neutral-500">
-              No payouts scheduled.
-            </div>
-          )}
+
         </div>
       )}
       {tab === "withdrawals" && (

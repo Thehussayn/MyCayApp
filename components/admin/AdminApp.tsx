@@ -1,4 +1,5 @@
 "use client";
+import { AdminLogo, AdminIcon } from "./Design";
 import Content from "./Content";
 import Audit from "./Audit";
 import Team from "./Team";
@@ -17,27 +18,26 @@ import {
   FileText,
   Settings,
   History,
-  LogOut,
 } from "lucide-react";
 
-import BrandLogo from "@/components/ui/BrandLogo";
 import PreviewBar from "@/components/portal/PreviewBar";
 import { request } from "@/components/portal/usePortal";
 import { Metric, label } from "@/components/portal/Investments";
 import { formatCurrency as money } from "@/lib/utils";
 
 const sections = [
-  { id: "overview", name: "Overview", icon: LayoutDashboard },
-  { id: "investors", name: "Investors", icon: Users },
-  { id: "finance", name: "Finance", icon: Landmark },
-  { id: "content", name: "Content", icon: FileText },
-  { id: "users", name: "Team", icon: Users },
-  { id: "audit", name: "Audit log", icon: History },
-  { id: "settings", name: "Settings", icon: Settings },
-];
+  { id: "overview", name: "Overview", icon: LayoutDashboard, asset: "e43d9.svg" },
+  { id: "investors", name: "Investors", icon: Users, asset: "8ca48.svg" },
+  { id: "finance", name: "Finance", icon: Landmark, asset: "60ef4.svg" },
+  { id: "content", name: "Content", icon: FileText, asset: "d08aa.svg" },
+  { id: "users", name: "Team", icon: Users, asset: "8ca48.svg" },
+  { id: "audit", name: "Audit log", icon: History, asset: "8f042.svg" },
+  { id: "settings", name: "Settings", icon: Settings, asset: "e1445.svg" },
+] as const;
 export default function AdminApp({ section, investorId }: { section: string; investorId?: string }) {
   const router = useRouter();
-  const [overview, setOverview] = useState<any>(null),
+  const [pageTitle, setPageTitle] = useState(""),
+    [overview, setOverview] = useState<any>(null),
     [data, setData] = useState<any>(null),
     [error, setError] = useState(""),
     [success, setSuccess] = useState(""),
@@ -57,6 +57,7 @@ export default function AdminApp({ section, investorId }: { section: string; inv
   }
   useEffect(() => {
     setData(null);
+    setPageTitle("");
     setError("");
     setSuccess("");
     setOpen(false);
@@ -114,12 +115,6 @@ export default function AdminApp({ section, investorId }: { section: string; inv
   );
   const nav = (
     <>
-      <div className="px-3 mb-6">
-        <p className="font-semibold capitalize">{overview?.user.fullName}</p>
-        <p className="text-xs text-neutral-500 mt-1 capitalize">
-          {label(overview?.user.role || "")}
-        </p>
-      </div>
       <nav aria-label="Operations navigation" className="space-y-1">
         {allowed.map((s) => (
           <Link
@@ -129,27 +124,18 @@ export default function AdminApp({ section, investorId }: { section: string; inv
             className={`workspace-nav ${s.id === section ? "active" : ""}`}
             aria-current={s.id === section ? "page" : undefined}
           >
-            <s.icon size={18} />
+            <AdminIcon file={s.asset} />
             {s.name}
           </Link>
         ))}
       </nav>
-      <button
-        className="workspace-nav w-full mt-8 border-t"
-        onClick={async () => {
-          await fetch("/api/auth/logout", { method: "POST" });
-          router.push("/login");
-        }}
-      >
-        <LogOut size={18} />
-        Sign out
-      </button>
+      <div className="admin-account"><div><strong>{overview?.user.fullName}</strong><span>{label(overview?.user.role || "")}</span></div><button className="action secondary" onClick={async () => {await fetch("/api/auth/logout", {method:"POST"});router.push("/login");}}>Sign out</button></div>
     </>
   );
   return (
-    <div className="workspace min-h-screen">
+    <div className="workspace admin-workspace min-h-screen">
       <PreviewBar />
-      <header className="workspace-header">
+      <header className="admin-mobile-header">
         <div className="flex gap-3 items-center">
           <button
             className="icon-button lg:hidden"
@@ -159,7 +145,7 @@ export default function AdminApp({ section, investorId }: { section: string; inv
           >
             <Menu size={22} />
           </button>
-          <BrandLogo href="/admin" variant="dark" className="h-7 sm:h-8" />
+          <AdminLogo />
           <span className="hidden sm:block border-l pl-5 ml-3 text-sm text-neutral-500">
             Operations
           </span>
@@ -168,14 +154,12 @@ export default function AdminApp({ section, investorId }: { section: string; inv
           {label(overview?.user.role || "")}
         </span>
       </header>
-      <div className="flex max-w-[1600px] mx-auto">
-        <aside className="hidden lg:block w-60 shrink-0 bg-white border-r p-5 min-h-[calc(100vh-76px)]">
-          <div className="sticky top-24">{nav}</div>
-        </aside>
-        <main className="min-w-0 flex-1 p-4 py-6 sm:p-8 lg:p-10">
-          <div className="max-w-6xl mx-auto space-y-6">
-            <h1 className="workspace-title">
-              {sections.find((s) => s.id === section)?.name || "Page not found"}
+      <div className="admin-layout">
+        <aside className="admin-sidebar"><AdminLogo/>{nav}</aside>
+        <main className="admin-main">
+          <div className="admin-page space-y-6">
+            <h1 className="workspace-title" data-admin-title>
+              {pageTitle || sections.find((s) => s.id === section)?.name || "Page not found"}
             </h1>
             {error && (
               <div className="error" role="alert">
@@ -194,7 +178,7 @@ export default function AdminApp({ section, investorId }: { section: string; inv
                 <>
                   {section === "overview" && (
                     <>
-                      <div className="grid sm:grid-cols-2 xl:grid-cols-4 gap-4">
+                      <div className="admin-overview-metrics grid sm:grid-cols-2 xl:grid-cols-4 gap-4">
                         {[
                           ["Investors", data.counts.investors],
                           ["Awaiting review", data.counts.pending],
@@ -233,23 +217,25 @@ export default function AdminApp({ section, investorId }: { section: string; inv
                     <Investors
                       data={data}
                       investorId={investorId}
+                      onTitleChange={setPageTitle}
+                      counts={overview.counts}
                       canReview={overview.permissions.includes("review")}
                       busy={busy}
                       act={act}
                     />
                   )}
                   {section === "finance" && (
-                    <Finance data={data} busy={busy} act={act} />
+                    <Finance data={data} busy={busy} act={act} onTitleChange={setPageTitle} />
                   )}
                   {section === "settings" && (
-                    <Configuration data={data.config} busy={busy} act={act} />
+                    <Configuration data={data.config} busy={busy} act={act} onTitleChange={setPageTitle} />
                   )}
                   {section === "users" && (
                     <Team data={data} busy={busy} act={act} />
                   )}
                   {section === "audit" && <Audit logs={data.logs} />}
                   {section === "content" && (
-                    <Content data={data} busy={busy} act={act} />
+                    <Content data={data} busy={busy} act={act} onTitleChange={setPageTitle} />
                   )}
                 </>
               )
@@ -270,10 +256,10 @@ export default function AdminApp({ section, investorId }: { section: string; inv
           />
           <aside
             data-admin-drawer
-            className="relative w-80 max-w-[88vw] h-full overflow-y-auto bg-white p-5"
+            className="admin-mobile-drawer relative w-80 max-w-[88vw] h-full overflow-y-auto p-5"
           >
             <div className="flex justify-between items-center mb-6">
-              <BrandLogo variant="dark" className="h-7" />
+              <AdminLogo />
               <button
                 ref={closeRef}
                 className="icon-button"

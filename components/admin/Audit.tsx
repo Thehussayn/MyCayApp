@@ -13,36 +13,21 @@ export default function Audit({ logs }: { logs: any[] }) {
       .includes(search.toLowerCase()),
   );
   return (
-    <section className="panel space-y-5">
-      <div className="flex flex-wrap gap-3 justify-between">
-        <h2 className="font-semibold">Audit trail</h2>
-        <button
-          className="action secondary"
-          onClick={() =>
-            exportCsv("audit.csv", [
-              ["Time", "Actor", "Role", "Target", "Action", "Notes"],
-              ...filtered.map((l) => [
-                l.timestamp,
-                l.actorEmail,
-                l.actorRole,
-                l.targetUserEmail,
-                l.action,
-                l.notes,
-              ]),
-            ])
-          }
-        >
-          Export CSV
-        </button>
-      </div>
+    <div className="space-y-6">
       <label className="field">
-        <span className="sr-only">Search audit trail</span>
+        <span>Search audit trail</span>
         <input
           placeholder="Search person, action, or date"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
         />
       </label>
+    <section className="panel space-y-5">
+      <div className="flex flex-wrap gap-3 justify-between">
+        <h2 className="font-semibold">Audit trail</h2>
+
+      </div>
+
       <div className="data-table">
         <table>
           <thead>
@@ -80,5 +65,24 @@ export default function Audit({ logs }: { logs: any[] }) {
         <p className="text-sm text-neutral-500">No matching activity.</p>
       )}
     </section>
+        <button
+          className="action secondary"
+          onClick={() =>
+            exportCsv("audit.csv", [
+              ["Time", "Actor", "Role", "Target", "Action", "Notes"],
+              ...filtered.map((l) => [
+                l.timestamp,
+                l.actorEmail,
+                l.actorRole,
+                l.targetUserEmail,
+                l.action,
+                l.notes,
+              ]),
+            ])
+          }
+        >
+          Export CSV
+        </button>
+    </div>
   );
 }

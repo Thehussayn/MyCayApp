@@ -3,6 +3,7 @@ import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import "./globals.css";
 import "./portal/investor.css";
+import "./admin/admin.css";
 
 export const viewport: Viewport = {
   themeColor: "#252A2D",

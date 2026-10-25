@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 import { label } from "@/components/portal/Investments";
 
@@ -11,8 +11,10 @@ export default function Configuration({
   data,
   busy,
   act,
-}: { data: any } & ActionProps) {
-  const [config, setConfig] = useState(data);
+  onTitleChange,
+}: { data: any; onTitleChange?: (title: string) => void } & ActionProps) {
+  const [config, setConfig] = useState(data), [tab,setTab] = useState("plans");
+  useEffect(()=>{onTitleChange?.(tab === "plans" ? "Plan settings" : "Role permissions")},[tab,onTitleChange]);
   return (
     <form
       className="space-y-6"
@@ -21,18 +23,13 @@ export default function Configuration({
         act({ action: "CONFIG", config });
       }}
     >
-      <div className="panel space-y-5">
-        <h2 className="font-semibold">Plan rules</h2>
-        <div className="grid sm:grid-cols-2 gap-5">
-          {[
+      <nav className="admin-settings-tabs" aria-label="Settings sections"><button type="button" className={`action ${tab === "plans" ? "active" : "secondary"}`} onClick={()=>setTab("plans")}>Plan settings</button><button type="button" className={`action ${tab === "roles" ? "active" : "secondary"}`} onClick={()=>setTab("roles")}>Role permissions</button></nav>
+      {tab === "plans" && <>
+      <section className="panel space-y-5"><h2>Plan limits</h2><div className="grid sm:grid-cols-2 gap-5">{[
             ["giapMin", "GIAP minimum (NGN)"],
             ["giapMax", "GIAP maximum (NGN)"],
             ["wealthstreamMin", "WealthStream minimum (NGN)"],
             ["wealthstreamMax", "WealthStream maximum (NGN)"],
-            ["noticeDays", "Withdrawal notice (days)"],
-            ["ngnPerUsd", "NGN per 1 USD"],
-            ["monthlyRate", "Monthly tier annual rate (%)"],
-            ["annualRate", "Annual tier annual rate (%)"],
           ].map(([key, title]) => (
             <label className="field" key={key}>
               {title}
@@ -55,9 +52,36 @@ export default function Configuration({
                 }
               />
             </label>
-          ))}
-        </div>
-        {[
+))}</div></section>
+      <section className="panel space-y-5"><h2>WealthStream terms</h2><div className="grid sm:grid-cols-2 gap-5">{[
+            ["monthlyRate", "Monthly tier annual rate (%)"],
+            ["annualRate", "Annual tier annual rate (%)"],
+            ["noticeDays", "Withdrawal notice (days)"],
+            ["ngnPerUsd", "NGN per 1 USD"],
+          ].map(([key, title]) => (
+            <label className="field" key={key}>
+              {title}
+              <input
+                type="number"
+                min="0"
+                step={key.includes("Rate") ? "0.01" : "1"}
+                required
+                value={
+                  key.includes("Rate")
+                    ? Math.round(config[key] * 10000) / 100
+                    : config[key]
+                }
+                onChange={(e) =>
+                  setConfig({
+                    ...config,
+                    [key]:
+                      Number(e.target.value) / (key.includes("Rate") ? 100 : 1),
+                  })
+                }
+              />
+            </label>
+))}</div></section>
+      <section className="panel space-y-5"><h2>Account investment rules</h2>        {[
           ["allowMultipleInvestments", "Allow multiple active investments"],
           ["allowMultiplePlans", "Allow both plan types on one account"],
         ].map(([key, title]) => (
@@ -72,8 +96,8 @@ export default function Configuration({
             {title}
           </label>
         ))}
-      </div>
-      <div className="panel space-y-5">
+</section></>}
+      {tab === "roles" &&       <div className="panel space-y-5">
         <h2 className="font-semibold">Role permissions</h2>
         <p className="text-sm text-neutral-500">
           Super Admin retains full access. Changes apply immediately.
@@ -158,6 +182,7 @@ export default function Configuration({
           </table>
         </div>
       </div>
+      }
       <button className="action" disabled={busy}>
         Save settings
       </button>

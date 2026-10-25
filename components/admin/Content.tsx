@@ -1,85 +1,11 @@
 "use client";
-import { useState } from "react";
-
-import { label } from "@/components/portal/Investments";
-
+import { useState, useEffect } from "react";
+import { Status } from "@/components/portal/Investments";
 import type { ActionProps } from "./types";
-
-export default function Content({
-  data,
-  busy,
-  act,
-}: { data: any } & ActionProps) {
-  const blank = {
-    id: "",
-    title: "",
-    slug: "",
-    excerpt: "",
-    body: "",
-    status: "DRAFT",
-  };
-  const [article, setArticle] = useState(blank);
-  return (
-    <div className="grid xl:grid-cols-[1fr_2fr] gap-5">
-      <div className="panel space-y-3">
-        <button className="action w-full" onClick={() => setArticle(blank)}>
-          New article
-        </button>
-        {data.articles.map((a: any) => (
-          <button
-            className="block w-full text-left border-b py-4"
-            key={a.id}
-            onClick={() => setArticle(a)}
-          >
-            <p className="font-semibold">{a.title}</p>
-            <p className="text-xs text-neutral-500 mt-1">{label(a.status)}</p>
-          </button>
-        ))}
-      </div>
-      <form
-        className="panel space-y-5"
-        onSubmit={(e) => {
-          e.preventDefault();
-          act({ action: "ARTICLE", article });
-        }}
-      >
-        <h2 className="font-semibold">
-          {article.id ? "Edit article" : "New article"}
-        </h2>
-        {["title", "slug", "excerpt"].map((k) => (
-          <label key={k} className="field capitalize">
-            {k}
-            <input
-              required={k !== "excerpt"}
-              value={(article as any)[k]}
-              onChange={(e) => setArticle({ ...article, [k]: e.target.value })}
-            />
-          </label>
-        ))}
-        <label className="field">
-          Article text
-          <textarea
-            required
-            rows={12}
-            value={article.body}
-            onChange={(e) => setArticle({ ...article, body: e.target.value })}
-          />
-        </label>
-        <label className="field">
-          Status
-          <select
-            value={article.status}
-            onChange={(e) => setArticle({ ...article, status: e.target.value })}
-          >
-            {["DRAFT", "PUBLISHED", "ARCHIVED"].map((s) => (
-              <option key={s}>{s}</option>
-            ))}
-          </select>
-        </label>
-        <button disabled={busy} className="action">
-          Save article
-        </button>
-      </form>
-    </div>
-  );
+export default function Content({data,busy,act,onTitleChange}:{data:any;onTitleChange?:(title:string)=>void}&ActionProps){
+ const blank={id:"",title:"",slug:"",excerpt:"",body:"",status:"DRAFT"};
+ const [article,setArticle]=useState(blank),[editing,setEditing]=useState(false);
+ useEffect(()=>{onTitleChange?.(editing?"Article editor":"Content")},[editing,onTitleChange]);
+ if(!editing)return <div className="space-y-6"><button className="action" onClick={()=>{setArticle(blank);setEditing(true)}}>New article</button><section className="panel admin-content-table"><h2 className="mb-5">Articles</h2><div className="data-table"><table><thead><tr><th>Article</th><th>URL slug</th><th>Updated</th><th>Status</th></tr></thead><tbody>{data.articles.map((a:any)=><tr key={a.id}><td><button className="hover:underline font-bold" onClick={()=>{setArticle(a);setEditing(true)}}>{a.title}</button></td><td>{a.slug}</td><td>{a.updatedAt?new Date(a.updatedAt).toLocaleDateString("en-GB"):"—"}</td><td><Status value={a.status}/></td></tr>)}</tbody></table></div>{!data.articles.length&&<p className="text-sm text-neutral-500 py-5">No articles yet.</p>}</section></div>;
+ return <form className="panel admin-article-form space-y-5" onSubmit={async e=>{e.preventDefault();if(await act({action:"ARTICLE",article}))setEditing(false)}}><h2>{article.id?"Edit article":"New article"}</h2><div className="grid sm:grid-cols-2 gap-5">{["title","slug","excerpt"].map(k=><label key={k} className={`field capitalize ${k==="excerpt"?"sm:col-span-2":""}`}>{k}<input required={k!=="excerpt"} value={(article as any)[k]} onChange={e=>setArticle({...article,[k]:e.target.value})}/></label>)}</div><label className="field">Article text<textarea required rows={12} value={article.body} onChange={e=>setArticle({...article,body:e.target.value})}/></label><label className="field">Status<select value={article.status} onChange={e=>setArticle({...article,status:e.target.value})}>{["DRAFT","PUBLISHED","ARCHIVED"].map(s=><option key={s}>{s}</option>)}</select></label><div className="flex flex-wrap gap-3"><button disabled={busy} className="action">Save article</button><button type="button" className="action secondary" onClick={()=>setEditing(false)}>Cancel</button></div></form>;
 }
