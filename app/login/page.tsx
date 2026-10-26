@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, Suspense } from "react";
+import React, { useState, useEffect, Suspense } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import AuthShell from "@/components/auth/AuthShell";
@@ -12,6 +12,13 @@ function LoginFormContent() {
   const searchParams = useSearchParams();
   const from = searchParams.get("from");
 
+  const [demo, setDemo] = useState<{email: string; password: string} | null>(null);
+  useEffect(() => {
+    fetch("/api/auth/demo", { cache: "no-store" })
+      .then(r => r.json())
+      .then(d => { if(d.enabled) setDemo({email:d.email,password:d.password}); })
+      .catch(() => {});
+  }, []);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -44,6 +51,11 @@ function LoginFormContent() {
             "Invalid credentials. Please verify your email and password.",
         );
         setIsSubmitting(false);
+        return;
+      }
+
+      if (data.redirect === "/admin") {
+        router.push("/admin");
         return;
       }
 
@@ -83,6 +95,17 @@ function LoginFormContent() {
           <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
           <div className="leading-relaxed">{errorMessage}</div>
         </div>
+      )}
+
+      {demo && (
+        <section aria-label="Demo admin login" className="rounded border border-[#e5d2a8] bg-[#faf6ed] p-4 text-sm">
+          <h2 className="font-semibold">Demo admin access</h2>
+          <dl className="mt-3 space-y-2">
+            <div><dt className="text-xs text-neutral-500">Email</dt><dd className="break-all select-all">{demo.email}</dd></div>
+            <div><dt className="text-xs text-neutral-500">Password</dt><dd className="break-all select-all">{demo.password}</dd></div>
+          </dl>
+          <button type="button" className="mt-3 text-xs font-semibold underline" onClick={() => {setEmail(demo.email);setPassword(demo.password);setErrorMessage("");}}>Use demo admin details</button>
+        </section>
       )}
 
       {/* Email Address */}

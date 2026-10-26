@@ -1,4 +1,6 @@
 import crypto from "crypto";
+import { POST as openPreview } from "@/app/api/preview/route";
+import { DEMO_ADMIN_EMAIL, DEMO_ADMIN_PASSWORD, isDemoLoginEnabled } from "@/lib/demo/access";
 import { isHostedDemo } from "@/lib/demo/state";
 import { NextRequest, NextResponse } from "next/server";
 import { findUserByEmail, updateUser, recordAuditLog } from "@/lib/db";
@@ -18,6 +20,18 @@ export async function POST(req: NextRequest) {
         { error: "Email and password are required." },
         { status: 400 },
       );
+    }
+
+    // Public demo access uses the existing isolated preview workspace only.
+    if (typeof email === "string" && email.trim().toLowerCase() === DEMO_ADMIN_EMAIL) {
+      if (!isDemoLoginEnabled() || password !== DEMO_ADMIN_PASSWORD) {
+        return NextResponse.json({ error: "Invalid email or password." }, { status: 401 });
+      }
+      return openPreview(new NextRequest(req.url, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ role: "SUPER_ADMIN" }),
+      }));
     }
 
     const user = findUserByEmail(email);

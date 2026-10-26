@@ -96,3 +96,12 @@ Registration creates a temporary demo account and signs it in. `/preview` is ava
 Set `DEMO_MODE=false` for a real platform. The normal KYC/document approval checks remain enforced outside demo mode, and a durable database/object-storage integration is still required for real hosted accounts.
 
 `npm run test:hosted-demo` tests registration, KYC, role switching, investment funding, login and tamper rejection across two local production servers. Start both with `DEMO_MODE=true`, the same test `SESSION_SECRET`, and distinct ports; set `TEST_URL` and `SECOND_TEST_URL`. The check verifies that the real local database is unchanged.
+
+### Demo admin sign-in
+
+With `DEMO_MODE=true`, `/login` displays the public review credentials:
+
+- Email: `admin@mycayapp.demo`
+- Password: `MyCayDemo2026!`
+
+Use **Use demo admin details**, then **Sign In**. This opens an isolated Super Admin preview workspace, preserving the current browser's demo records. These credentials also work in local development. They are hidden and rejected on production deployments with demo mode disabled; they do not create or authenticate a real administrator account.
