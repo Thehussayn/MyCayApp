@@ -1,5 +1,7 @@
 "use client";
 import { AdminLogo, AdminIcon } from "./Design";
+import designSets from "./design-sets.json";
+import type dimensions from "./figma-assets.json";
 import Content from "./Content";
 import Audit from "./Audit";
 import Team from "./Team";
@@ -113,6 +115,8 @@ export default function AdminApp({ section, investorId }: { section: string; inv
   const allowed = sections.filter(
     (s) => s.id === "overview" || overview?.permissions.includes(s.id),
   );
+  const assetSet = designSets[(investorId ? "profile" : section) as keyof typeof designSets] || designSets.investors;
+  const logoFiles = assetSet.logo as (keyof typeof dimensions)[];
   const nav = (
     <>
       <nav aria-label="Operations navigation" className="space-y-1">
@@ -124,7 +128,7 @@ export default function AdminApp({ section, investorId }: { section: string; inv
             className={`workspace-nav ${s.id === section ? "active" : ""}`}
             aria-current={s.id === section ? "page" : undefined}
           >
-            <AdminIcon file={s.asset} />
+            <span className="admin-icon-slot"><AdminIcon file={assetSet.icons[s.id] as keyof typeof dimensions} /></span>
             {s.name}
           </Link>
         ))}
@@ -133,9 +137,9 @@ export default function AdminApp({ section, investorId }: { section: string; inv
     </>
   );
   return (
-    <div className="workspace admin-workspace min-h-screen">
+    <div className={`workspace admin-workspace min-h-screen ${section === "overview" ? "admin-overview" : ""}`}>
       <PreviewBar />
-      <header className="admin-mobile-header">
+      <header className={`admin-mobile-header ${section === "overview" ? "admin-overview-header" : ""}`}>
         <div className="flex gap-3 items-center">
           <button
             className="icon-button lg:hidden"
@@ -145,17 +149,17 @@ export default function AdminApp({ section, investorId }: { section: string; inv
           >
             <Menu size={22} />
           </button>
-          <AdminLogo />
+          <AdminLogo light={section === "overview"} files={logoFiles} />
           <span className="hidden sm:block border-l pl-5 ml-3 text-sm text-neutral-500">
             Operations
           </span>
         </div>
         <span className="text-xs capitalize text-neutral-500">
-          {label(overview?.user.role || "")}
+          {section === "overview" ? `${overview?.user.fullName || ""} · ` : ""}{label(overview?.user.role || "")}
         </span>
       </header>
       <div className="admin-layout">
-        <aside className="admin-sidebar"><AdminLogo/>{nav}</aside>
+        <aside className="admin-sidebar"><AdminLogo light={section === "overview"} files={logoFiles}/>{nav}</aside>
         <main className="admin-main">
           <div className="admin-page space-y-6">
             <h1 className="workspace-title" data-admin-title>
@@ -197,7 +201,7 @@ export default function AdminApp({ section, investorId }: { section: string; inv
                             </div>
                           ))}
                       </div>
-                      <div className="grid md:grid-cols-2 gap-4">
+                      <div className="admin-module-shortcuts grid md:grid-cols-2 gap-6">
                         {allowed
                           .filter((s) => s.id !== "overview")
                           .map((s) => (
@@ -206,7 +210,7 @@ export default function AdminApp({ section, investorId }: { section: string; inv
                               href={`/admin/${s.id}`}
                               className="panel flex items-center gap-4 hover:border-brand-gold"
                             >
-                              <s.icon size={22} className="text-brand-gold" />
+                              <span className="admin-icon-slot"><AdminIcon file={designSets.overview.icons[s.id] as keyof typeof dimensions} /></span>
                               <span className="font-semibold">{s.name}</span>
                             </Link>
                           ))}
@@ -259,7 +263,7 @@ export default function AdminApp({ section, investorId }: { section: string; inv
             className="admin-mobile-drawer relative w-80 max-w-[88vw] h-full overflow-y-auto p-5"
           >
             <div className="flex justify-between items-center mb-6">
-              <AdminLogo />
+              <AdminLogo light={section === "overview"} files={logoFiles} />
               <button
                 ref={closeRef}
                 className="icon-button"

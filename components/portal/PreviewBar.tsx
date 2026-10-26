@@ -1,7 +1,8 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import Link from "next/link";
 export default function PreviewBar() {
+  const barRef = useRef<HTMLDivElement>(null);
   const [preview, setPreview] = useState(false);
   const [busy, setBusy] = useState(false);
   const [role, setRole] = useState("INVESTOR");
@@ -15,6 +16,16 @@ export default function PreviewBar() {
       })
       .catch(() => {});
   }, []);
+  useEffect(() => {
+    const bar = barRef.current;
+    const workspace = bar?.closest<HTMLElement>(".workspace");
+    if (!bar || !workspace) return;
+    const update = () => workspace.style.setProperty("--preview-bar-height", `${bar.getBoundingClientRect().height}px`);
+    update();
+    const observer = new ResizeObserver(update);
+    observer.observe(bar);
+    return () => { observer.disconnect(); workspace.style.removeProperty("--preview-bar-height"); };
+  }, [preview]);
   if (!preview) return null;
   async function switchRole(value: string) {
     setBusy(true);
@@ -34,7 +45,7 @@ export default function PreviewBar() {
     }
   }
   return (
-    <div className="preview-bar">
+    <div ref={barRef} className="preview-bar">
       <div className="flex flex-wrap items-center justify-between gap-2">
         <p>
           <strong>Preview</strong>

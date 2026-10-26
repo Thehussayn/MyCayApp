@@ -1,8 +1,7 @@
 "use client";
-import { AdminMetrics } from "./Design";
+import { AdminIcon, AdminMetrics } from "./Design";
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { ArrowLeft } from "lucide-react";
 import { Metric, Status, label } from "@/components/portal/Investments";
 import { formatCurrency as money } from "@/lib/utils";
 
@@ -23,6 +22,8 @@ export default function Investors({
   const [query, setQuery] = useState(""),
     [status, setStatus] = useState("ALL"),
     [reason, setReason] = useState(""),
+    [message, setMessage] = useState(""),
+    [detailTab, setDetailTab] = useState("profile"),
     [create, setCreate] = useState(false),
     [edit, setEdit] = useState<any>(null),
     [form, setForm] = useState({
@@ -32,7 +33,8 @@ export default function Investors({
       country: "Nigeria",
       password: "",
     });
-  useEffect(() => {onTitleChange?.(create ? "Add investor" : investorId ? "Investor profile" : "Investors")},[create,investorId,onTitleChange]);
+  useEffect(() => {onTitleChange?.(create ? "Add investor" : "Investors")},[create,investorId,onTitleChange]);
+  useEffect(() => {setDetailTab("profile");setReason("");setMessage("");setEdit(null)}, [investorId]);
   const selected = data.investors.find((u: any) => u.id === investorId);
   const investors = data.investors.filter(
     (u: any) =>
@@ -51,7 +53,7 @@ export default function Investors({
     return (
       <div className="space-y-5">
         <Link href="/admin/investors" className="inline-flex gap-2 text-sm items-center">
-          <ArrowLeft size={16} />
+          <AdminIcon file="0c8e7.svg"/>
           Investors
         </Link>
         <div className="panel space-y-5">
@@ -71,6 +73,14 @@ export default function Investors({
           </div>
 
         </div>
+        <nav role="tablist" className="admin-detail-tabs" aria-label="Investor details">{[["profile","Profile"],["investments","Investments"],["communications","Communication log"],["audit","Audit log"]].map(([id,title]) => <button key={id} type="button" role="tab" aria-selected={detailTab === id} aria-controls={`investor-${id}`} id={`investor-tab-${id}`} tabIndex={detailTab === id ? 0 : -1} onKeyDown={e => {
+          const tabs = ["profile","investments","communications","audit"];
+          const current = tabs.indexOf(id);
+          const next = e.key === "ArrowRight" ? (current+1)%4 : e.key === "ArrowLeft" ? (current+3)%4 : e.key === "Home" ? 0 : e.key === "End" ? 3 : -1;
+          if(next < 0) return;
+          e.preventDefault();setDetailTab(tabs[next]);document.getElementById(`investor-tab-${tabs[next]}`)?.focus();
+        }} className={detailTab === id ? "active" : ""} onClick={()=>setDetailTab(id)}>{title}</button>)}</nav>
+        <div id="investor-profile" role="tabpanel" aria-labelledby="investor-tab-profile" hidden={detailTab !== "profile"} className="space-y-5">
         <section className="panel space-y-5">
           <div className="flex justify-between gap-3">
             <h2 className="font-semibold">Profile</h2>
@@ -255,6 +265,8 @@ export default function Investors({
               </div>
             </section>
           )}
+        </div>
+        <div id="investor-investments" role="tabpanel" aria-labelledby="investor-tab-investments" hidden={detailTab !== "investments"}>
         <section className="panel space-y-4">
           <h2 className="font-semibold">Investments</h2>
           {selected.investments.map((i: any) => (
@@ -272,34 +284,35 @@ export default function Investors({
             <p className="text-sm text-neutral-500">No investments.</p>
           )}
         </section>
+        </div><div id="investor-communications" role="tabpanel" aria-labelledby="investor-tab-communications" hidden={detailTab !== "communications"}>
         <section className="panel space-y-4">
           <h2 className="font-semibold">Communication log</h2>
           <label className="field">
             Message or internal note
             <textarea
-              value={reason}
-              onChange={(e) => setReason(e.target.value)}
+              value={message}
+              onChange={(e) => setMessage(e.target.value)}
             />
           </label>
           <div className="flex flex-wrap gap-3">
             <button
               className="action"
-              disabled={busy || !reason.trim()}
+              disabled={busy || !message.trim()}
               onClick={async () => {
-                if (await act({ action: "NOTE", userId: selected.id, reason }))
-                  setReason("");
+                if (await act({ action: "NOTE", userId: selected.id, reason: message }))
+                  setMessage("");
               }}
             >
               Save internal note
             </button>
             <button
               className="action secondary"
-              disabled={busy || !reason.trim()}
+              disabled={busy || !message.trim()}
               onClick={async () => {
                 if (
-                  await act({ action: "NOTIFY", userId: selected.id, reason })
+                  await act({ action: "NOTIFY", userId: selected.id, reason: message })
                 )
-                  setReason("");
+                  setMessage("");
               }}
             >
               Send in-app message
@@ -314,7 +327,8 @@ export default function Investors({
             </div>
           ))}
         </section>
-        <Audit logs={selected.audit} />
+        </div><div id="investor-audit" role="tabpanel" aria-labelledby="investor-tab-audit" hidden={detailTab !== "audit"}><Audit logs={selected.audit} compact/></div>
+
       </div>
     );
   return (

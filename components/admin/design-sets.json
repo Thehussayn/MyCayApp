@@ -1,0 +1,122 @@
+{
+  "overview": {
+    "logo": [
+      "6b7b8.svg",
+      "3f7bd.svg"
+    ],
+    "icons": {
+      "overview": "1aa99.svg",
+      "investors": "ef871.svg",
+      "finance": "e2304.svg",
+      "content": "a79d3.svg",
+      "users": "ef871.svg",
+      "audit": "fcb78.svg",
+      "settings": "9a80e.svg"
+    }
+  },
+  "investors": {
+    "logo": [
+      "6b7b8.svg",
+      "628d9.svg"
+    ],
+    "icons": {
+      "overview": "e43d9.svg",
+      "investors": "8ca48.svg",
+      "finance": "60ef4.svg",
+      "content": "d08aa.svg",
+      "users": "8ca48.svg",
+      "audit": "8f042.svg",
+      "settings": "e1445.svg"
+    }
+  },
+  "profile": {
+    "logo": [
+      "ce6a5.svg",
+      "628d9.svg"
+    ],
+    "icons": {
+      "overview": "e43d9.svg",
+      "investors": "8ca48.svg",
+      "finance": "60ef4.svg",
+      "content": "d08aa.svg",
+      "users": "8ca48.svg",
+      "audit": "8f042.svg",
+      "settings": "e1445.svg"
+    }
+  },
+  "finance": {
+    "logo": [
+      "e0550.svg",
+      "9ce3c.svg"
+    ],
+    "icons": {
+      "overview": "f82c7.svg",
+      "investors": "2fab8.svg",
+      "finance": "be0e8.svg",
+      "content": "4da29.svg",
+      "users": "2fab8.svg",
+      "audit": "a5e26.svg",
+      "settings": "3a7f8.svg"
+    }
+  },
+  "users": {
+    "logo": [
+      "dbf52.svg",
+      "9ce3c.svg"
+    ],
+    "icons": {
+      "overview": "c7147.svg",
+      "investors": "fc43a.svg",
+      "finance": "be0e8.svg",
+      "content": "6c994.svg",
+      "users": "fc43a.svg",
+      "audit": "a5e26.svg",
+      "settings": "3a7f8.svg"
+    }
+  },
+  "content": {
+    "logo": [
+      "dbf52.svg",
+      "9ce3c.svg"
+    ],
+    "icons": {
+      "overview": "c7147.svg",
+      "investors": "fc43a.svg",
+      "finance": "be0e8.svg",
+      "content": "6c994.svg",
+      "users": "fc43a.svg",
+      "audit": "a5e26.svg",
+      "settings": "3a7f8.svg"
+    }
+  },
+  "audit": {
+    "logo": [
+      "dbf52.svg",
+      "9ce3c.svg"
+    ],
+    "icons": {
+      "overview": "c7147.svg",
+      "investors": "fc43a.svg",
+      "finance": "be0e8.svg",
+      "content": "6c994.svg",
+      "users": "fc43a.svg",
+      "audit": "a5e26.svg",
+      "settings": "3a7f8.svg"
+    }
+  },
+  "settings": {
+    "logo": [
+      "dbf52.svg",
+      "9ce3c.svg"
+    ],
+    "icons": {
+      "overview": "c7147.svg",
+      "investors": "fc43a.svg",
+      "finance": "be0e8.svg",
+      "content": "6c994.svg",
+      "users": "fc43a.svg",
+      "audit": "a5e26.svg",
+      "settings": "3a7f8.svg"
+    }
+  }
+}

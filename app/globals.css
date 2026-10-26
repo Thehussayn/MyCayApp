@@ -305,3 +305,14 @@
     scroll-behavior: auto !important;
   }
 }
+
+/* Workspace navigation remains visible while the page content scrolls. */
+.workspace>.preview-bar{position:sticky;top:0;z-index:45}
+@media(min-width:1024px){
+ .admin-workspace .admin-sidebar{position:sticky;top:var(--preview-bar-height,0px);height:calc(100dvh - var(--preview-bar-height,0px));min-height:0;align-self:flex-start;overflow-y:auto;overscroll-behavior:contain}
+ .investor-workspace .investor-header{position:sticky;top:var(--preview-bar-height,0px);z-index:35}
+ .investor-workspace .investor-sidebar{position:sticky;top:calc(80px + var(--preview-bar-height,0px));height:calc(100dvh - 80px - var(--preview-bar-height,0px));align-self:flex-start;overflow-y:auto;overscroll-behavior:contain}
+ .investor-sidebar>.investor-sidebar-content{min-height:100%}
+ .investor-sidebar .investor-navigation{flex:1;min-height:0}
+ .investor-sidebar .investor-account,.investor-sidebar .investor-support{flex-shrink:0}
+}

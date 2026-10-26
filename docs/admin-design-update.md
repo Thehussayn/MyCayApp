@@ -29,3 +29,16 @@ Figma returned its Starter-plan MCP call-limit error for Overview, Investor prof
 - `npm run test:admin-design`: admin screens at 360, 390, 768 and 1440px, investor/add/profile views, content editor, finance/settings tabs, mobile navigation and original SVG loading/intrinsic geometry. Set `TEST_URL`, `PLAYWRIGHT_MODULE` and optionally `CHROME_EXECUTABLE` for your local setup.
 
 The original SVGs are stored in `public/figma/admin`, with their root dimensions in `components/admin/figma-assets.json`. Figma sample names, account totals and ledger entries are not embedded in production UI.
+
+## Update from section 304:7843
+
+All 16 frames in [the newer Admin section](https://www.figma.com/design/gSShkMvZor2DyLNT1CPcWs/Untitled?node-id=304-7843) were retrieved with high-fidelity context and screenshots. This resolves the earlier access limitation for the screens included in that section.
+
+- Investor profiles now have Profile, Investments, Communication log and Audit log tabs. The Profile tab includes documents and KYC review; communications use a separate message draft from the KYC review note. Tabs support keyboard navigation.
+- Team accounts use a table and a selected-account access panel. Role updates require Save access; reset, deactivation, reactivation and account creation keep their existing server authorization.
+- The audit search and CSV export share a toolbar, with a compact version inside the investor audit tab.
+- Overview follows its light header/sidebar frame; operational pages retain their dark sidebars. Frame-specific SVGs and intrinsic dimensions are recorded in `design-sets.json` and `figma-assets.json`.
+- Admin and investor desktop sidebars stay pinned below their preview bar/header, with their own vertical scrolling when needed. A ResizeObserver tracks the preview bar height so wrapping does not obscure navigation.
+- `npm run test:workspace-navigation` checks real page scrolling, preview/header offsets, keyboard tabs and mobile drawer scroll locking. `npm run test:admin-design` also covers Overview and all investor detail tabs.
+
+Design example names, personal information and amounts remain dynamic application records, rather than copied fixture content.

@@ -1,0 +1,50 @@
+import assert from "node:assert/strict";
+const { chromium } = await import(process.env.PLAYWRIGHT_MODULE || "playwright");
+const base = process.env.TEST_URL || "http://127.0.0.1:3102";
+const browser = await chromium.launch({headless:true,...(process.env.CHROME_EXECUTABLE ? {executablePath:process.env.CHROME_EXECUTABLE} : {})});
+try {
+ const page = await browser.newPage({viewport:{width:1440,height:900}});
+ await page.goto(base+"/preview");
+ await page.getByRole("button",{name:"Open preview workspace"}).click();
+ await page.waitForURL("**/portal/dashboard");
+ const seed = await page.request.post(base+"/api/portal/biodata",{data:{step:1,data:{fullName:"Alex Morgan"},isSaveAndExit:true}});
+ assert.equal(seed.status(),200);
+ await page.locator("#preview-role").selectOption("SUPER_ADMIN");
+ await page.waitForURL("**/admin");
+ await page.goto(base+"/admin/investors/preview_INVESTOR");
+ await page.getByRole("heading",{name:"Alex Morgan",exact:true}).waitFor();
+ await page.getByRole("heading",{name:"Personal details",exact:true}).waitFor();
+ async function checkPinned(sidebar, topElement, label) {
+   await page.evaluate(()=>scrollTo(0,0));
+   const before = await page.locator(sidebar).boundingBox();
+   const boundary = await page.locator(topElement).boundingBox();
+   await page.evaluate(()=>scrollTo(0,600));
+   await page.waitForTimeout(150);
+   const after = await page.locator(sidebar).boundingBox();
+   assert.ok(await page.evaluate(()=>scrollY>200),label+" has no scrolling content");
+   assert.ok(Math.abs(before.y-after.y)<1,label+" moved with page");
+   assert.ok(Math.abs(after.y-(boundary.y+boundary.height))<1,label+" overlaps header/preview bar");
+   assert.ok(after.y+after.height<=900.5,label+" extends below viewport");
+ }
+ await checkPinned(".admin-sidebar",".preview-bar","Admin sidebar");
+ await page.screenshot({path:"/tmp/admin-sidebar-after-scroll.png"});
+ await page.getByRole("tab",{name:"Profile",exact:true}).focus();
+ await page.keyboard.press("ArrowRight");
+ assert.equal(await page.getByRole("tab",{name:"Investments",exact:true}).getAttribute("aria-selected"),"true");
+ await page.keyboard.press("End");
+ assert.equal(await page.getByRole("tab",{name:"Audit log",exact:true}).getAttribute("aria-selected"),"true");
+ await page.locator("#preview-role").selectOption("INVESTOR");
+ await page.waitForURL("**/portal/dashboard");
+ await page.goto(base+"/portal/profile");
+ await page.getByRole("heading",{name:"Personal details",exact:true}).waitFor();
+ await checkPinned(".investor-sidebar",".investor-header","Investor sidebar");
+ await page.screenshot({path:"/tmp/investor-sidebar-after-scroll.png"});
+ await page.setViewportSize({width:390,height:844});
+ await page.getByRole("button",{name:"Open navigation",exact:true}).click();
+ await page.getByRole("dialog").waitFor();
+ assert.equal(await page.evaluate(()=>document.body.style.overflow),"hidden");
+ await page.keyboard.press("Escape");
+ assert.equal(await page.getByRole("dialog").count(),0);
+ assert.notEqual(await page.evaluate(()=>document.body.style.overflow),"hidden");
+ console.log("PASS: admin and investor sidebars stay below preview/header during page scrolling; tabs support keyboard navigation; mobile drawer preserves scroll locking.");
+} finally { await browser.close(); }

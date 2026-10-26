@@ -88,6 +88,7 @@ export default function Configuration({
           <label key={key} className="flex items-center gap-3 text-sm">
             <input
               type="checkbox"
+              className="admin-rule-checkbox"
               checked={config[key]}
               onChange={(e) =>
                 setConfig({ ...config, [key]: e.target.checked })

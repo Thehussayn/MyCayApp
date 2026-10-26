@@ -43,7 +43,7 @@ export default function Finance({
   const today = new Date().toISOString().slice(0, 10);
   useEffect(() => {onTitleChange?.(({ledger:"Investment ledger",payouts:"Payouts",withdrawals:"Withdrawal review",reconciliation:"Bank reconciliation",reports:"Reports & exchange rate"} as Record<string,string>)[tab])},[tab,onTitleChange]);
   return (
-    <>
+    <div className="admin-finance-views space-y-6">
       <div className="admin-finance-tabs">
         {["ledger", "payouts", "withdrawals", "reconciliation", "reports"].map(
           (t) => (
@@ -583,7 +583,7 @@ export default function Finance({
                 Transactions CSV
               </button>
               <a
-                className="action secondary"
+                className="action"
                 href="/api/admin/report"
                 target="_blank"
                 rel="noreferrer"
@@ -599,6 +599,7 @@ export default function Finance({
               act({ action: "FX", rate });
             }}
           >
+            <h2>Exchange rate</h2>
             <label className="field">
               NGN per 1 USD
               <input
@@ -616,7 +617,7 @@ export default function Finance({
           </form>
         </>
       )}
-    </>
+    </div>
   );
 }
 function parseCsv(text: string) {
